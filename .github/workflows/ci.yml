@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # `nx affected` diffs against the base branch, so it needs the history.
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/aetera/aetera-web/package-lock.json
+
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          # Only the default branch writes to the shared cache, so a PR cannot poison it.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      # Nx 자신 + 프론트엔드. aetera-web 은 자체 lockfile 을 가진 독립 npm 프로젝트라 둘 다 설치한다.
+      - run: npm ci
+      - run: npm ci
+        working-directory: apps/aetera/aetera-web
+
+      # PR: only the projects the diff can reach. Push to main: everything, so the
+      # Gradle and Nx caches are populated from a known-good full build.
+      # 백엔드(gradle build)와 프론트엔드(next build)가 같은 그래프에서 함께 돈다.
+      - name: Build (ktlint, compile, unit tests, next build)
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx nx affected -t build --base=origin/${{ github.base_ref }}
+          else
+            npx nx run-many -t build
+          fi
+
+      # Split out because these need a Docker daemon and are far slower.
+      # The `integration` JUnit tag keeps them out of the step above.
+      # Not routed through Nx: the target is marked uncacheable, so there is nothing to gain.
+      - name: Integration tests (Testcontainers)
+        run: ./gradlew integrationTest
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/**'
+          retention-days: 7

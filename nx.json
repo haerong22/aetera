@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": ["default", "!{projectRoot}/src/test/**/*"],
+    "sharedGlobals": [
+      "{workspaceRoot}/gradle/libs.versions.toml",
+      "{workspaceRoot}/gradle.properties",
+      "{workspaceRoot}/settings.gradle.kts",
+      "{workspaceRoot}/build.gradle.kts",
+      "{workspaceRoot}/build-logic/**/*"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "./gradlew :{projectName}:build"
+      },
+      "inputs": ["default", "^production"],
+      "outputs": ["{projectRoot}/build/libs", "{projectRoot}/build/classes"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "./gradlew :{projectName}:test"
+      },
+      "inputs": ["default", "^production"],
+      "outputs": ["{projectRoot}/build/test-results", "{projectRoot}/build/reports/tests"]
+    },
+    "integrationTest": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "./gradlew :{projectName}:integrationTest"
+      }
+    },
+    "docker-build": {
+      "cache": false
+    }
+  },
+  "plugins": ["./tools/nx-gradle-lite.js"]
+}

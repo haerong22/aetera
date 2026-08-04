@@ -1,0 +1,15 @@
+{
+  "name": "aetera",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "nx run-many -t build",
+    "test": "nx run-many -t test",
+    "affected": "nx affected -t build",
+    "graph": "nx graph"
+  },
+  "devDependencies": {
+    "nx": "23.1.1"
+  }
+}
