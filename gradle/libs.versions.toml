@@ -1,0 +1,84 @@
+[versions]
+java = "21"
+kotlin = "2.3.21"
+spring-boot = "4.1.0"
+kotlin-logging = "8.0.4"
+kotest = "6.2.3"
+# Pinned to what the Spring Boot BOM manages, so Spring and non-Spring modules never diverge.
+junit = "6.0.3"
+mockk = "1.14.11"
+springmockk = "5.0.1"
+springdoc = "3.0.3"
+archunit = "1.4.2"
+spotless = "8.8.0"
+ktlint = "1.8.0"
+nimbus-jose-jwt = "10.3"
+
+[libraries]
+# --- Gradle plugin artifacts (consumed by :build-logic only) ---
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-allopen-plugin = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
+kotlin-noarg-plugin = { module = "org.jetbrains.kotlin:kotlin-noarg", version.ref = "kotlin" }
+spring-boot-gradle-plugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
+spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
+
+# --- Platforms (BOM) ---
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotest-bom = { module = "io.kotest:kotest-bom", version.ref = "kotest" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+
+# --- Kotlin ---
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging" }
+
+# --- Spring Boot starters (versions come from the BOM) ---
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-docker-compose = { module = "org.springframework.boot:spring-boot-docker-compose" }
+spring-context = { module = "org.springframework:spring-context" }
+spring-tx = { module = "org.springframework:spring-tx" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
+
+# --- Auth ---
+# 액세스 토큰(JWT HS256) 서명/검증용. Boot 4.1 BOM 이 관리하지 않아 버전을 직접 고정한다.
+nimbus-jose-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus-jose-jwt" }
+
+# --- Persistence ---
+postgresql = { module = "org.postgresql:postgresql" }
+# Spring Boot 4 split the auto-configurations out of `spring-boot-autoconfigure` into per-technology
+# modules, so `org.flywaydb:flyway-core` on its own no longer triggers migrations — this starter does.
+spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+
+# --- API docs ---
+springdoc-openapi-webmvc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+
+# --- Test ---
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-starter-data-jpa-test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core" }
+kotest-property = { module = "io.kotest:kotest-property" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[bundles]
+kotest = ["kotest-runner-junit5", "kotest-assertions-core", "kotest-property"]
+testcontainers = ["spring-boot-testcontainers", "testcontainers-junit-jupiter", "testcontainers-postgresql"]
+
+# [plugins] 섹션은 두지 않습니다.
+# 모듈은 `id("convention.*")`(build-logic 제공)만 쓰고, 외부 플러그인은 build-logic 이
+# 위 [libraries] 의 `*-gradle-plugin` artifact 로 클래스패스에 올려 버전 없이 적용합니다.
+# 두 곳에 같은 플러그인을 적어두면 버전이 어긋나도 아무도 모르게 됩니다.
