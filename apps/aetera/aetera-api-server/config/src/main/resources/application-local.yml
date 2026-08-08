@@ -1,0 +1,18 @@
+spring:
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start_and_stop
+      skip:
+        in-tests: true
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+
+logging:
+  level:
+    io.aetera: debug
+    org.hibernate.SQL: debug

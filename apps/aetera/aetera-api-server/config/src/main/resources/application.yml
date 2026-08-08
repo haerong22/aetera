@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: aetera-api-server
+
+  threads:
+    virtual:
+      enabled: true
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        default_batch_fetch_size: 100
+
+  flyway:
+    enabled: true
+
+  jackson:
+    default-property-inclusion: non_null
+
+security:
+  password:
+    iterations: 210000
+
+aetera:
+  auth:
+    # 로컬 개발용 기본값. 운영은 application-prod.yml 이 JWT_SECRET 환경변수를 요구한다.
+    jwt-secret: local-dev-secret-key-32-bytes-min!!
+    access-token-ttl: 15m
+    cookie-secure: false
+  cors:
+    allowed-origins: http://localhost:3000
+
+server:
+  shutdown: graceful
+  error:
+    whitelabel:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},%X{requestId:-}] "

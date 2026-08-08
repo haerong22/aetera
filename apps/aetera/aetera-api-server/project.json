@@ -1,0 +1,17 @@
+{
+  "name": "aetera-api-server",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "tags": ["scope:backend"],
+  "implicitDependencies": ["aetera-app"],
+  "targets": {
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker build -f apps/aetera/aetera-api-server/Dockerfile -t aetera-api-server ."
+      }
+    }
+  }
+}
