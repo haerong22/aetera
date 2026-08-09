@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/*
+ * Aetera 디자인 토큰.
+ * 톤: Calm / Premium / Human — 아주 밝은 중성 배경 위에 낮은 채도의 indigo 를 포인트로 쓴다.
+ * 넉넉한 여백, 큰 라운드, 아주 약한 그림자, 또렷한 타이포가 원칙.
+ */
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+
+  /* 브랜드 — soft indigo */
+  --color-primary: #5b5fef;
+  --color-primary-hover: #494dd8;
+  --color-primary-light: #eef0ff;
+  --color-accent: #ff6f0f;
+  --color-accent-light: #fff1e7;
+
+  /* 상태 */
+  --color-danger: #f04452;
+  --color-danger-light: #fee9eb;
+  --color-success: #2ba471;
+  --color-success-light: #e6f6ef;
+  --color-warning: #d98b2b;
+  --color-warning-light: #faf1e2;
+
+  /* 그레이 스케일 */
+  --color-grey-900: #171a21;
+  --color-grey-800: #333d4b;
+  --color-grey-700: #4e5968;
+  --color-grey-600: #6b7684;
+  --color-grey-500: #7b8494;
+  --color-grey-400: #b0b8c1;
+  --color-grey-300: #d1d6db;
+  --color-grey-200: #e8eaf0;
+  --color-grey-100: #f1f3f9;
+  --color-grey-50: #f7f8fc;
+
+  /* 라운드 */
+  --radius-card: 1.25rem; /* 20px */
+  --radius-button: 0.875rem; /* 14px */
+  --radius-input: 0.875rem;
+  --radius-chip: 0.5rem;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: var(--color-grey-50);
+  color: var(--color-grey-900);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 키보드 포커스는 항상 눈에 보이게 */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 모션 최소화 설정 존중 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 스크롤바를 은은하게 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-grey-300) transparent;
+}

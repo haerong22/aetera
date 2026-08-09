@@ -1,0 +1,39 @@
+{
+  "name": "aetera-web",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "tags": ["scope:frontend"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "production",
+        "{projectRoot}/package-lock.json",
+        { "env": "NEXT_PUBLIC_API_URL" }
+      ],
+      "outputs": ["{projectRoot}/.next-build"],
+      "options": {
+        "cwd": "apps/aetera/aetera-web",
+        "command": "npm run build"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/package-lock.json"],
+      "options": {
+        "cwd": "apps/aetera/aetera-web",
+        "command": "npm run lint"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "apps/aetera/aetera-web",
+        "command": "npm run dev"
+      }
+    }
+  }
+}
