@@ -1,21 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight, Plus, Puzzle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { PageSpinner } from "@/components/ui/Spinner";
-import { ApiError } from "@/lib/api-client";
+import { ModuleDisabledNotice, isModuleDisabled } from "../ModuleDisabledNotice";
 import { monthRange } from "./calendar";
 import { MonthCalendar } from "./components/MonthCalendar";
 import { EventDialog } from "./components/EventDialog";
 import { useScheduleEvents, type ScheduleEvent } from "./api";
-
-/** 백엔드 모듈 가드의 403(FORBIDDEN) — 아직 이 모듈을 활성화하지 않았다는 뜻. */
-function isModuleDisabled(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 403;
-}
 
 export function SchedulePage() {
   const today = new Date();
@@ -36,25 +29,7 @@ export function SchedulePage() {
 
   if (isPending) return <PageSpinner />;
 
-  if (error && isModuleDisabled(error)) {
-    return (
-      <Card className="mx-auto flex max-w-md flex-col items-center gap-4 py-14 text-center">
-        <div className="flex size-14 items-center justify-center rounded-3xl bg-primary-light text-primary">
-          <Puzzle size={26} />
-        </div>
-        <div>
-          <p className="text-lg font-bold text-grey-900">일정 모듈을 아직 사용하고 있지 않아요</p>
-          <p className="mt-1 text-[14px] text-grey-500">모듈 스토어에서 켜면 바로 쓸 수 있어요.</p>
-        </div>
-        <Link
-          href="/settings/modules"
-          className="rounded-(--radius-button) bg-primary px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-primary-hover"
-        >
-          모듈 스토어로 가기
-        </Link>
-      </Card>
-    );
-  }
+  if (error && isModuleDisabled(error)) return <ModuleDisabledNotice title="일정" />;
 
   if (error) {
     return <p className="py-20 text-center text-grey-500">일정을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</p>;

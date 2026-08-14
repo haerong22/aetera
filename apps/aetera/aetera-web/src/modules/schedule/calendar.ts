@@ -1,3 +1,5 @@
+import { toLocalDateIso } from "@/lib/date";
+
 /** 달력 계산 유틸 — 의존성 없이 Date 만 쓴다. */
 
 export interface CalendarCell {
@@ -56,10 +58,7 @@ export function monthRange(year: number, month: number): { from: Date; to: Date 
 /** `datetime-local` input 값 (로컬 타임존 기준). */
 export function toDateTimeLocal(date: Date): string {
   const pad = (value: number) => String(value).padStart(2, "0");
-  return (
-    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
-    `T${pad(date.getHours())}:${pad(date.getMinutes())}`
-  );
+  return `${toLocalDateIso(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 export function formatTime(iso: string): string {
