@@ -1,5 +1,6 @@
 package io.aetera.gateway.schedule
 
+import io.aetera.gateway.common.saveMerging
 import io.aetera.model.schedule.ScheduleEvent
 import io.aetera.model.schedule.ScheduleEventId
 import io.aetera.model.schedule.ScheduleEventRepository
@@ -12,12 +13,12 @@ import org.springframework.stereotype.Repository
 class ScheduleEventRepositoryJpaAdapter(
     private val scheduleEventJpaRepository: ScheduleEventJpaRepository,
 ) : ScheduleEventRepository {
-    override fun save(event: ScheduleEvent): ScheduleEvent {
-        val entity =
-            scheduleEventJpaRepository.findByIdOrNull(event.id.value)?.apply { applyFrom(event) }
-                ?: ScheduleEventJpaEntity.from(event)
-        return scheduleEventJpaRepository.save(entity).toModel()
-    }
+    override fun save(event: ScheduleEvent): ScheduleEvent = scheduleEventJpaRepository
+        .saveMerging(
+            id = event.id.value,
+            update = { it.applyFrom(event) },
+            create = { ScheduleEventJpaEntity.from(event) },
+        ).toModel()
 
     override fun getById(id: ScheduleEventId): ScheduleEvent? = scheduleEventJpaRepository.findByIdOrNull(id.value)?.toModel()
 

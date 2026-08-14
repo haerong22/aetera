@@ -1,11 +1,11 @@
 package io.aetera.gateway.auth
 
+import io.aetera.gateway.common.saveMerging
 import io.aetera.model.auth.RefreshToken
 import io.aetera.model.auth.RefreshTokenId
 import io.aetera.model.auth.RefreshTokenRepository
 import io.aetera.model.auth.RefreshTokenRevocation
 import io.aetera.model.user.UserId
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import java.time.Instant
 
@@ -13,12 +13,12 @@ import java.time.Instant
 class RefreshTokenRepositoryJpaAdapter(
     private val refreshTokenJpaRepository: RefreshTokenJpaRepository,
 ) : RefreshTokenRepository {
-    override fun save(token: RefreshToken): RefreshToken {
-        val entity =
-            refreshTokenJpaRepository.findByIdOrNull(token.id.value)?.apply { applyFrom(token) }
-                ?: RefreshTokenJpaEntity.from(token)
-        return refreshTokenJpaRepository.save(entity).toModel()
-    }
+    override fun save(token: RefreshToken): RefreshToken = refreshTokenJpaRepository
+        .saveMerging(
+            id = token.id.value,
+            update = { it.applyFrom(token) },
+            create = { RefreshTokenJpaEntity.from(token) },
+        ).toModel()
 
     override fun getByTokenHash(tokenHash: String): RefreshToken? = refreshTokenJpaRepository.findByTokenHash(tokenHash)?.toModel()
 
