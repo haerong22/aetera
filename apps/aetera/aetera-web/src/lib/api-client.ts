@@ -36,6 +36,21 @@ export function setSessionExpiredHandler(handler: (() => void) | null) {
   sessionExpiredHandler = handler;
 }
 
+/**
+ * 응답을 기다리는 최대 시간.
+ *
+ * 이게 없으면 서버가 응답을 영영 안 주는 상황(예외 처리 도중 죽어 커넥션만 열려 있는 경우)에
+ * fetch 가 끝나지 않는다. 그러면 낙관적으로 반영해 둔 화면이 "저장됨"인 채로 굳고
+ * 실패 안내도 뜨지 않아서, 사용자는 저장된 줄 알고 넘어간다. 끊어야 알릴 수 있다.
+ */
+const REQUEST_TIMEOUT_MS = 15_000;
+
+/** 부르는 쪽이 준 취소 신호가 있으면 함께 묶는다 — 타임아웃이 그걸 덮어쓰면 안 된다. */
+function timeoutSignal(callerSignal: AbortSignal | null | undefined): AbortSignal {
+  const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  return callerSignal ? AbortSignal.any([callerSignal, timeout]) : timeout;
+}
+
 async function rawFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   if (!headers.has("Content-Type") && init.body) {
@@ -44,7 +59,13 @@ async function rawFetch(path: string, init: RequestInit = {}): Promise<Response>
   if (accessToken) {
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
-  return fetch(`${API_URL}${path}`, { ...init, headers, credentials: "include" });
+  // 신호는 호출마다 새로 만든다. 재시도가 첫 시도에서 이미 흘러간 시간을 물려받으면 안 된다.
+  return fetch(`${API_URL}${path}`, {
+    ...init,
+    headers,
+    credentials: "include",
+    signal: timeoutSignal(init.signal),
+  });
 }
 
 async function parseError(response: Response): Promise<ApiError> {
@@ -92,9 +113,10 @@ export async function tryRefreshSession(): Promise<RefreshOutcome> {
         response = await fetch(`${API_URL}/api/v1/auth/refresh`, {
           method: "POST",
           credentials: "include",
+          signal: timeoutSignal(null),
         });
       } catch {
-        // 네트워크 오류. 토큰이 죽었다는 근거가 없으므로 세션을 끝내지 않는다.
+        // 네트워크 오류이거나 시간 초과. 토큰이 죽었다는 근거가 없으므로 세션을 끝내지 않는다.
         return { ok: false, sessionEnded: false };
       }
       if (!response.ok) {
