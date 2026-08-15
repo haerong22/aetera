@@ -1,0 +1,47 @@
+"use client";
+
+import { Flag } from "lucide-react";
+import { Card } from "@/components/ui/Card";
+import { isoFromToday } from "../dates";
+import { AnchorDateForm } from "./AnchorDateForm";
+
+/** 기준일을 정하기 전. 아래에 단계 미리보기가 이어지므로 여기서는 "왜 날짜부터인지"만 말한다. */
+export function StartJourneyCard({
+  anchorLabel,
+  taskCount,
+  pending,
+  failed,
+  onStart,
+}: {
+  anchorLabel: string;
+  taskCount: number;
+  pending: boolean;
+  failed: boolean;
+  onStart: (anchorDate: string) => void;
+}) {
+  return (
+    <Card className="flex flex-col gap-4 border-primary/20 bg-primary-light/40">
+      <div className="flex items-start gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-white">
+          <Flag size={20} aria-hidden />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-[17px] font-bold text-grey-900">{anchorLabel}을 정해주세요</h2>
+          <p className="mt-1 text-[14px] leading-relaxed text-grey-600">
+            날짜를 넣으면 {taskCount}개의 할 일에 각각 <b className="font-semibold text-grey-800">내 달력의 마감일</b>이
+            붙어요. 나중에 바꿔도 체크한 항목은 그대로 남아요.
+          </p>
+        </div>
+      </div>
+
+      <AnchorDateForm
+        anchorLabel={anchorLabel}
+        initialValue={isoFromToday(30)}
+        submitLabel="시작하기"
+        pending={pending}
+        failed={failed}
+        onSubmit={onStart}
+      />
+    </Card>
+  );
+}
