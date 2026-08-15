@@ -36,5 +36,6 @@ interface ErrorCode {
         const val AUTH_BAND: Int = 2 * BAND_SIZE
         const val MODULE_BAND: Int = 3 * BAND_SIZE
         const val SCHEDULE_BAND: Int = 4 * BAND_SIZE
+        const val GUIDE_BAND: Int = 5 * BAND_SIZE
     }
 }
