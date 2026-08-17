@@ -1,40 +1,26 @@
 "use client";
 
 import { useId, useState } from "react";
-import { AlertCircle, ExternalLink, MessageSquarePlus, Trash2 } from "lucide-react";
+import { AlertCircle, CalendarPlus, ExternalLink, MessageSquarePlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import type { GuideTask, TaskPatch } from "../api";
-import { dueTone, formatShortDate } from "../dates";
 
-const toneClasses = {
-  overdue: "bg-danger-light text-danger",
-  soon: "bg-accent-light text-accent",
-  normal: "bg-grey-100 text-grey-600",
-} as const;
-
-/**
- * 할 일 한 줄.
- *
- * 조작할 수 있는 것(체크박스, 링크, 메모 버튼)은 전부 서로의 바깥에 둔다 —
- * 중첩되면 키보드로 하나를 고르는데 다른 게 눌린다.
- */
 export function TaskItem({
   task,
   started,
   failed,
+  onAddToCalendar,
   onChange,
 }: {
   task: GuideTask;
-  /** 여정을 시작하기 전에는 저장할 곳이 없어 체크를 막는다. */
   started: boolean;
-  /** 이 항목의 저장이 실패했다. 안내는 화면 아래가 아니라 실패한 항목 옆에 있어야 눈에 띈다. */
   failed: boolean;
+  onAddToCalendar?: () => void;
   onChange: (patch: TaskPatch) => void;
 }) {
   const checkboxId = useId();
   const [editingNote, setEditingNote] = useState<string | null>(null);
-  const tone = dueTone(task.dueDate, task.done);
 
   function saveNote() {
     const note = editingNote?.trim() ?? "";
@@ -65,29 +51,11 @@ export function TaskItem({
             {task.title}
           </label>
 
-          <div className="flex shrink-0 items-center gap-1.5">
-            {!task.required && (
-              <span className="rounded-(--radius-chip) bg-grey-100 px-1.5 py-0.5 text-[11px] font-semibold text-grey-500">
-                참고
-              </span>
-            )}
-            {task.dueDate ? (
-              <span
-                className={cn(
-                  "rounded-(--radius-chip) px-2 py-0.5 text-[12px] font-semibold tabular-nums",
-                  toneClasses[tone],
-                )}
-              >
-                {tone === "overdue" ? "지남 · " : ""}
-                {formatShortDate(task.dueDate)}
-              </span>
-            ) : (
-              // 시작 전에도 "언제쯤 할 일인지"는 보여준다. 이게 있어야 시작 전 미리보기가 의미를 갖는다.
-              <span className="rounded-(--radius-chip) bg-grey-100 px-2 py-0.5 text-[12px] font-semibold text-grey-500 tabular-nums">
-                {task.dueOffsetDays === 0 ? "당일" : `D${task.dueOffsetDays > 0 ? "+" : ""}${task.dueOffsetDays}`}
-              </span>
-            )}
-          </div>
+          {!task.required && (
+            <span className="shrink-0 rounded-(--radius-chip) bg-grey-100 px-1.5 py-0.5 text-[11px] font-semibold text-grey-500">
+              참고
+            </span>
+          )}
         </div>
 
         <p className={cn("mt-1 text-[13.5px] leading-relaxed", task.done ? "text-grey-400" : "text-grey-600")}>
@@ -126,6 +94,17 @@ export function TaskItem({
             >
               <MessageSquarePlus size={14} aria-hidden />
               메모
+            </button>
+          )}
+
+          {onAddToCalendar && (
+            <button
+              type="button"
+              onClick={onAddToCalendar}
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-grey-500 transition-colors hover:text-grey-700"
+            >
+              <CalendarPlus size={14} aria-hidden />
+              캘린더에 추가
             </button>
           )}
         </div>

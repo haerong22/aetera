@@ -4,26 +4,25 @@ import { useId, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/components/ui/cn";
-import type { GuidePhase, TaskPatch } from "../api";
+import type { GuidePhase, GuideTask, TaskPatch } from "../api";
 import { TaskItem } from "./TaskItem";
 
-/**
- * 단계 하나. 다 끝낸 단계는 접힌 채로 시작한다 —
- * 27개를 한 화면에 펼쳐 두면 지금 할 일이 어디 있는지 보이지 않는다.
- */
 export function PhaseSection({
   phase,
   order,
   started,
   failedTaskKeys,
+  canAddToCalendar,
   onChangeTask,
+  onAddToCalendar,
 }: {
   phase: GuidePhase;
   order: number;
   started: boolean;
-  /** 저장에 실패해 아직 반영되지 않은 항목. 그 항목 옆에 안내를 붙인다. */
   failedTaskKeys: ReadonlySet<string>;
+  canAddToCalendar: boolean;
   onChangeTask: (taskKey: string, patch: TaskPatch) => void;
+  onAddToCalendar: (task: GuideTask) => void;
 }) {
   const doneCount = phase.tasks.filter((task) => task.done).length;
   const completed = doneCount === phase.tasks.length;
@@ -73,6 +72,9 @@ export function PhaseSection({
               task={task}
               started={started}
               failed={failedTaskKeys.has(task.key)}
+              onAddToCalendar={
+                canAddToCalendar && task.dueDate && !task.done ? () => onAddToCalendar(task) : undefined
+              }
               onChange={(patch) => onChangeTask(task.key, patch)}
             />
           ))}

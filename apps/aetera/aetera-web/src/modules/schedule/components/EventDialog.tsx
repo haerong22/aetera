@@ -23,9 +23,10 @@ interface EventDialogProps {
   event?: ScheduleEvent | null;
   /** 생성 모드에서 미리 선택된 날짜. */
   initialDate?: Date;
+  initial?: { title?: string; description?: string; allDay?: boolean };
 }
 
-export function EventDialog({ open, onClose, event, initialDate }: EventDialogProps) {
+export function EventDialog({ open, onClose, event, initialDate, initial }: EventDialogProps) {
   const create = useCreateEvent();
   const update = useUpdateEvent();
   const remove = useDeleteEvent();
@@ -54,11 +55,11 @@ export function EventDialog({ open, onClose, event, initialDate }: EventDialogPr
       start.setHours(9, 0, 0, 0);
       const end = new Date(base);
       end.setHours(10, 0, 0, 0);
-      setTitle("");
-      setDescription("");
+      setTitle(initial?.title ?? "");
+      setDescription(initial?.description ?? "");
       setStartsAt(toDateTimeLocal(start));
       setEndsAt(toDateTimeLocal(end));
-      setAllDay(false);
+      setAllDay(initial?.allDay ?? false);
       setColor(DEFAULT_EVENT_COLOR);
     }
   }, [open, event, initialDate]);
