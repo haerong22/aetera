@@ -14,3 +14,19 @@ export const frontendModules: FrontendModule[] = [scheduleModule, resignationMod
 export const moduleById: ReadonlyMap<string, FrontendModule> = new Map(
   frontendModules.map((module) => [module.id, module]),
 );
+
+function assertOneProviderPerCapability(modules: FrontendModule[]) {
+  const providers = new Map<string, string[]>();
+  for (const module of modules) {
+    for (const capability of Object.keys(module.capabilities ?? {})) {
+      providers.set(capability, [...(providers.get(capability) ?? []), module.id]);
+    }
+  }
+  for (const [capability, ids] of providers) {
+    if (ids.length > 1) {
+      throw new Error(`능력 '${capability}' 를 여러 모듈이 제공합니다: ${ids.join(", ")}`);
+    }
+  }
+}
+
+assertOneProviderPerCapability(frontendModules);
