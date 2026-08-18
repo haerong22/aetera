@@ -28,8 +28,11 @@ export function StartJourneyCard({
         <div className="min-w-0">
           <h2 className="text-[17px] font-bold text-grey-900">{anchorLabel}을 정해주세요</h2>
           <p className="mt-1 text-[14px] leading-relaxed text-grey-600">
-            날짜를 넣으면 {taskCount}개의 할 일에 각각 <b className="font-semibold text-grey-800">내 달력의 마감일</b>이
-            붙어요. 나중에 바꿔도 체크한 항목은 그대로 남아요.
+            날짜를 넣으면 <b className="font-semibold text-grey-800">남은 날짜</b>가 계산되고, {taskCount}개 할 일의
+            체크와 메모를 저장할 수 있어요. 캘린더에 넣을 때도 알맞은 날짜가 자동으로 채워져요.
+          </p>
+          <p className="mt-1 text-[13px] leading-relaxed text-grey-500">
+            나중에 날짜를 바꿔도 체크한 항목은 그대로 남아요.
           </p>
         </div>
       </div>

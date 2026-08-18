@@ -40,7 +40,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
     GuideTemplate(
         id = GuideId("resignation"),
         title = "퇴사 준비",
-        summary = "퇴사일만 정하면, 언제 무엇을 해야 하는지 순서대로 알려드려요.",
+        summary = "퇴사일을 정하면 무엇을 어떤 순서로 준비해야 하는지 알려드려요.",
         anchorLabel = "퇴사 예정일",
         disclaimer =
             "회사 규정과 개인 상황에 따라 달라질 수 있어요. 금액·기한이 걸린 항목은 " +

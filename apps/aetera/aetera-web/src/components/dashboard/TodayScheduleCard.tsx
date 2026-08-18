@@ -42,7 +42,7 @@ export function TodayScheduleCard({ events, isLoading, isError }: TodayScheduleC
     <Card className="h-full">
       <CardHeader
         icon={<CalendarDays size={16} />}
-        title={isLoading || isError ? "오늘 일정" : `오늘 일정 · ${events.length}`}
+        title={isLoading || isError ? "오늘 할 일" : `오늘 할 일 · ${events.length}`}
         action={
           <Link
             href={modulePath(SCHEDULE_MODULE_ID)}
@@ -64,7 +64,7 @@ export function TodayScheduleCard({ events, isLoading, isError }: TodayScheduleC
         </div>
       ) : events.length === 0 ? (
         <div className="py-7 text-center">
-          <p className="text-[15px] font-medium text-grey-700">오늘 예정된 일정이 없어요.</p>
+          <p className="text-[15px] font-medium text-grey-700">오늘 예정된 일이 없어요.</p>
           <p className="mt-1 text-[13px] text-grey-500">여유 시간을 목표나 휴식에 활용해보세요.</p>
         </div>
       ) : (
