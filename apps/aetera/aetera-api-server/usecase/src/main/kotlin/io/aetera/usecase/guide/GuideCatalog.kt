@@ -18,7 +18,12 @@ import org.springframework.stereotype.Component
 class GuideCatalog(
     guides: List<GuideModule>,
 ) {
-    private val byId: Map<GuideId, GuideTemplate> = guides.associate { it.template.id to it.template }
+    private val byId: Map<GuideId, GuideTemplate> =
+        guides
+            .also { modules ->
+                val duplicated = modules.groupBy { it.template.id }.filterValues { it.size > 1 }.keys
+                check(duplicated.isEmpty()) { "가이드 아이디가 겹칩니다: $duplicated" }
+            }.associate { it.template.id to it.template }
 
     /**
      * 모듈 가드가 이미 "배포됐고 사용자가 켠 모듈"임을 보장한 뒤에 불린다.

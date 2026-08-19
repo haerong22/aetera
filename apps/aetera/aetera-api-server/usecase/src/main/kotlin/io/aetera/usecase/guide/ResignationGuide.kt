@@ -3,8 +3,6 @@ package io.aetera.usecase.guide
 import io.aetera.model.guide.GuideId
 import io.aetera.model.guide.GuideLink
 import io.aetera.model.guide.GuidePhase
-import io.aetera.model.guide.GuideTask
-import io.aetera.model.guide.GuideTaskKey
 import io.aetera.model.guide.GuideTemplate
 
 /**
@@ -18,7 +16,7 @@ import io.aetera.model.guide.GuideTemplate
  *
  * **할 일 키는 배포 후 바꾸지 않는다.** 사용자의 체크 상태가 이 키로 저장된다.
  */
-private object Links {
+private object ResignationLinks {
     val EI = GuideLink("고용보험", "https://www.ei.go.kr")
     val NHIS = GuideLink("국민건강보험공단", "https://www.nhis.or.kr")
     val NPS = GuideLink("국민연금공단", "https://www.nps.or.kr")
@@ -26,15 +24,6 @@ private object Links {
     val HOMETAX = GuideLink("국세청 홈택스", "https://www.hometax.go.kr")
     val FOUR_INSURE = GuideLink("4대사회보험 정보연계센터", "https://www.4insure.or.kr")
 }
-
-private fun task(
-    key: String,
-    title: String,
-    description: String,
-    dueOffsetDays: Int,
-    required: Boolean = true,
-    link: GuideLink? = null,
-) = GuideTask(GuideTaskKey(key), title, description, dueOffsetDays, required, link)
 
 internal val RESIGNATION_GUIDE: GuideTemplate =
     GuideTemplate(
@@ -202,7 +191,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "회사가 신고하는 절차지만, 늦어지면 건강보험 전환과 실업급여 신청이 함께 밀려요. " +
                                         "직접 조회해서 처리 여부를 확인하세요.",
                                 dueOffsetDays = 7,
-                                link = Links.FOUR_INSURE,
+                                link = ResignationLinks.FOUR_INSURE,
                             ),
                             task(
                                 key = "employment-cert",
@@ -211,7 +200,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "실업급여를 받으려면 회사가 제출한 이직확인서가 처리돼 있어야 해요. " +
                                         "이직 사유가 사실과 다르게 적히면 수급이 막힐 수 있으니 내용까지 확인하세요.",
                                 dueOffsetDays = 7,
-                                link = Links.EI,
+                                link = ResignationLinks.EI,
                             ),
                             task(
                                 key = "health-insurance",
@@ -220,7 +209,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "지역가입자 전환, 피부양자 등재, 임의계속가입 중에 고릅니다. 임의계속가입은 조건을 갖추면 " +
                                         "직장 다닐 때 수준의 보험료를 일정 기간 유지할 수 있는데, 신청 기한이 짧으니 먼저 문의해 보세요.",
                                 dueOffsetDays = 10,
-                                link = Links.NHIS,
+                                link = ResignationLinks.NHIS,
                             ),
                             task(
                                 key = "pension-exception",
@@ -230,7 +219,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                         "나중에 추납할지도 같이 생각해 두세요.",
                                 dueOffsetDays = 10,
                                 required = false,
-                                link = Links.NPS,
+                                link = ResignationLinks.NPS,
                             ),
                             task(
                                 key = "unemployment-benefit",
@@ -239,7 +228,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "고용보험 가입 기간과 이직 사유 요건을 채워야 해요. 수급 기간에 한도가 있어서 " +
                                         "신청이 늦어지면 그만큼 못 받게 되니 자격이 된다면 바로 진행하세요.",
                                 dueOffsetDays = 14,
-                                link = Links.EI,
+                                link = ResignationLinks.EI,
                             ),
                         ),
                 ),
@@ -256,7 +245,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "퇴직금은 퇴직일로부터 정해진 기한 안에 지급하는 것이 원칙이에요(당사자 합의로 연장 가능). " +
                                         "금액이 예상과 다르면 산정 기준이 된 평균임금부터 확인해 보세요.",
                                 dueOffsetDays = 14,
-                                link = Links.MOEL,
+                                link = ResignationLinks.MOEL,
                             ),
                             task(
                                 key = "final-payroll",
@@ -278,7 +267,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "근로소득·퇴직소득 원천징수영수증은 이직한 회사의 연말정산과 종합소득세 신고에 필요해요. " +
                                         "홈택스에서도 조회되지만 반영이 늦을 수 있으니 회사에서 받아 두면 확실해요.",
                                 dueOffsetDays = 30,
-                                link = Links.HOMETAX,
+                                link = ResignationLinks.HOMETAX,
                             ),
                             task(
                                 key = "career-cert",
