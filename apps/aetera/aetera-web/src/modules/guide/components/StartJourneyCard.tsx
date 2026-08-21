@@ -2,7 +2,7 @@
 
 import { Flag } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { isoFromToday } from "../dates";
+import { isoFromToday } from "@/lib/date";
 import { AnchorDateForm } from "./AnchorDateForm";
 
 /** 기준일을 정하기 전. 아래에 단계 미리보기가 이어지므로 여기서는 "왜 날짜부터인지"만 말한다. */

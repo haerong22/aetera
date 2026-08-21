@@ -47,6 +47,7 @@ class UpdateGuideTaskServiceTest :
                 userId = owner,
                 guideId = RESIGNATION_GUIDE.id,
                 anchorDate = LocalDate.of(2026, 9, 30),
+                today = LocalDate.of(2026, 8, 14),
                 now = now,
             )
 

@@ -11,6 +11,7 @@ import java.time.LocalDate
 class GuideJourneyTest :
     DescribeSpec({
         val now = Instant.parse("2026-08-14T00:00:00Z")
+        val today = LocalDate.of(2026, 8, 14)
         val guideId = GuideId("resignation")
 
         fun journey(anchorDate: LocalDate = LocalDate.of(2026, 9, 30)) = GuideJourney.start(
@@ -18,6 +19,7 @@ class GuideJourneyTest :
             userId = UserId.next(),
             guideId = guideId,
             anchorDate = anchorDate,
+            today = today,
             now = now,
         )
 
@@ -45,7 +47,7 @@ class GuideJourneyTest :
             it("퇴사일이 밀리면 기준일만 바뀐다 — 체크 상태는 별도 애그리거트라 영향받지 않는다") {
                 val target = journey()
 
-                target.changeAnchorDate(LocalDate.of(2026, 10, 31), now)
+                target.changeAnchorDate(LocalDate.of(2026, 10, 31), today)
 
                 target.anchorDate shouldBe LocalDate.of(2026, 10, 31)
                 target.startedAt shouldBe now
@@ -54,7 +56,7 @@ class GuideJourneyTest :
             it("바꾸려는 기준일도 같은 검증을 받는다") {
                 val target = journey()
 
-                shouldThrow<CoreException> { target.changeAnchorDate(LocalDate.of(2206, 1, 1), now) }
+                shouldThrow<CoreException> { target.changeAnchorDate(LocalDate.of(2206, 1, 1), today) }
                     .errorCode shouldBe GuideErrorCode.INVALID_ANCHOR_DATE
                 target.anchorDate shouldBe LocalDate.of(2026, 9, 30)
             }

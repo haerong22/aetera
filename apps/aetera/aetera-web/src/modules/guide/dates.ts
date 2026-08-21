@@ -1,4 +1,4 @@
-import { fromLocalDateIso, localToday, toLocalDateIso } from "@/lib/date";
+import { fromLocalDateIso, localToday } from "@/lib/date";
 
 const MILLIS_PER_DAY = 86_400_000;
 
@@ -12,12 +12,6 @@ export function formatKoreanDate(iso: string): string {
     month: "long",
     day: "numeric",
   });
-}
-
-export function isoFromToday(days: number): string {
-  const date = localToday();
-  date.setDate(date.getDate() + days);
-  return toLocalDateIso(date);
 }
 
 export function formatDDay(iso: string): string {

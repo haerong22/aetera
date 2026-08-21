@@ -4,7 +4,6 @@ import io.aetera.model.user.UserId
 import io.aetera.shared.error.ensure
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
 
 /**
  * 사용자 한 명이 가이드 하나를 실제로 밟고 있는 상태. `(userId, guideId)` 당 최대 한 행.
@@ -30,9 +29,9 @@ class GuideJourney private constructor(
     /** 기준일을 바꾸면 모든 마감일이 함께 움직인다 — 퇴사일이 밀리는 건 흔한 일이다. */
     fun changeAnchorDate(
         anchorDate: LocalDate,
-        now: Instant,
+        today: LocalDate,
     ) {
-        this.anchorDate = validateAnchorDate(anchorDate, now)
+        this.anchorDate = validateAnchorDate(anchorDate, today)
     }
 
     override fun equals(other: Any?): Boolean = this === other || (other is GuideJourney && id == other.id)
@@ -45,7 +44,6 @@ class GuideJourney private constructor(
         /**
          * 기준일이 오늘에서 벗어날 수 있는 최대 연수. 오타로 `2206-09-30` 을 넣으면 모든 마감이
          * 180년 뒤로 가서 화면이 조용히 무의미해지므로 상식선에서 막는다.
-         * 사용자의 로컬 날짜와 서버 UTC 날짜가 최대 하루 어긋나는 것은 이 폭 안에서 무해하다.
          */
         private const val ANCHOR_RANGE_YEARS = 5L
 
@@ -54,12 +52,13 @@ class GuideJourney private constructor(
             userId: UserId,
             guideId: GuideId,
             anchorDate: LocalDate,
+            today: LocalDate,
             now: Instant,
         ): GuideJourney = GuideJourney(
             id = id,
             userId = userId,
             guideId = guideId,
-            anchorDate = validateAnchorDate(anchorDate, now),
+            anchorDate = validateAnchorDate(anchorDate, today),
             startedAt = now,
         )
 
@@ -73,9 +72,8 @@ class GuideJourney private constructor(
 
         private fun validateAnchorDate(
             anchorDate: LocalDate,
-            now: Instant,
+            today: LocalDate,
         ): LocalDate {
-            val today = LocalDate.ofInstant(now, ZoneOffset.UTC)
             ensure(
                 anchorDate.isAfter(today.minusYears(ANCHOR_RANGE_YEARS)) &&
                     anchorDate.isBefore(today.plusYears(ANCHOR_RANGE_YEARS)),

@@ -5,6 +5,7 @@ import io.aetera.model.guide.GuideJourney
 import io.aetera.model.guide.GuideJourneyId
 import io.aetera.model.guide.GuideJourneyRepository
 import io.aetera.model.user.UserId
+import io.aetera.usecase.common.today
 import io.aetera.usecase.guide.cmd.StartGuideJourneyCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -33,16 +34,18 @@ class StartGuideJourneyService(
         val template = guideCatalog.getOrThrow(GuideId(command.guideId))
         val owner = UserId(command.userId)
         val now = clock.instant()
+        val today = clock.today()
 
         val journey =
             guideJourneyRepository
                 .getByUserIdAndGuideId(owner, template.id)
-                ?.apply { changeAnchorDate(command.anchorDate, now) }
+                ?.apply { changeAnchorDate(command.anchorDate, today) }
                 ?: GuideJourney.start(
                     id = GuideJourneyId.next(),
                     userId = owner,
                     guideId = template.id,
                     anchorDate = command.anchorDate,
+                    today = today,
                     now = now,
                 )
         val saved = guideJourneyRepository.save(journey)

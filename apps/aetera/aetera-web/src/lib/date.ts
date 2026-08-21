@@ -13,3 +13,9 @@ export function localToday(): Date {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
+
+export function isoFromToday(days: number): string {
+  const date = localToday();
+  date.setDate(date.getDate() + days);
+  return toLocalDateIso(date);
+}

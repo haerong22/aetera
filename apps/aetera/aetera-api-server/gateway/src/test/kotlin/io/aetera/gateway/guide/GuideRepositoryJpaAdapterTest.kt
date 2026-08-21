@@ -37,6 +37,7 @@ class GuideRepositoryJpaAdapterTest {
     private lateinit var entityManager: EntityManager
 
     private val now: Instant = Instant.parse("2026-08-14T00:00:00Z")
+    private val today: LocalDate = LocalDate.of(2026, 8, 14)
     private val guideId = GuideId("resignation")
 
     private fun flushAndClear() {
@@ -50,7 +51,7 @@ class GuideRepositoryJpaAdapterTest {
     ): GuideJourney {
         val saved =
             guideJourneyRepository.save(
-                GuideJourney.start(GuideJourneyId.next(), owner, guideId, anchorDate, now),
+                GuideJourney.start(GuideJourneyId.next(), owner, guideId, anchorDate, today, now),
             )
         flushAndClear()
         return saved
@@ -100,7 +101,7 @@ class GuideRepositoryJpaAdapterTest {
         val journey = startJourney(owner)
 
         val reloaded = guideJourneyRepository.getByUserIdAndGuideId(owner, guideId)!!
-        reloaded.changeAnchorDate(LocalDate.of(2026, 10, 31), now)
+        reloaded.changeAnchorDate(LocalDate.of(2026, 10, 31), today)
         guideJourneyRepository.save(reloaded)
         flushAndClear()
 
