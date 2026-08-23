@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageSpinner } from "@/components/ui/Spinner";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { ModuleDisabledNotice, isModuleDisabled } from "../ModuleDisabledNotice";
 import { monthRange } from "./calendar";
 import { MonthCalendar } from "./components/MonthCalendar";
@@ -19,7 +20,7 @@ export function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
   const { from, to } = monthRange(year, month);
-  const { data: events, isPending, error } = useScheduleEvents(from, to);
+  const { data: events, error, refetch } = useScheduleEvents(from, to);
 
   function moveMonth(delta: number) {
     const moved = new Date(year, month + delta, 1);
@@ -27,13 +28,8 @@ export function SchedulePage() {
     setMonth(moved.getMonth());
   }
 
-  if (isPending) return <PageSpinner />;
-
   if (error && isModuleDisabled(error)) return <ModuleDisabledNotice title="일정" />;
-
-  if (error) {
-    return <p className="py-20 text-center text-grey-500">일정을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</p>;
-  }
+  if (!events) return error ? <ErrorState onRetry={() => void refetch()} /> : <PageSpinner />;
 
   return (
     <div className="flex flex-col gap-5">
