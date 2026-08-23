@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { isoFromToday } from "@/lib/date";
 import {
   useCreateRenewal,
@@ -15,9 +16,6 @@ import {
   type RenewalCycle,
 } from "../api";
 import { CATEGORY_LABELS, CYCLE_LABELS } from "../labels";
-
-const SELECT_CLASS =
-  "h-[52px] w-full rounded-(--radius-input) border border-grey-200 bg-white px-3 text-[15px] text-grey-900 outline-none focus:border-primary";
 
 export function RenewalDialog({
   open,
@@ -82,23 +80,12 @@ export function RenewalDialog({
           onChange={(event) => setTitle(event.target.value)}
         />
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="renewal-category" className="text-[13px] font-medium text-grey-600">
-            분류
-          </label>
-          <select
-            id="renewal-category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value as RenewalCategory)}
-            className={SELECT_CLASS}
-          >
-            {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label="분류"
+          value={category}
+          options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ value, label }))}
+          onChange={(event) => setCategory(event.target.value as RenewalCategory)}
+        />
 
         <Input
           label="만기일"
@@ -108,23 +95,12 @@ export function RenewalDialog({
           onChange={(event) => setExpiresAt(event.target.value)}
         />
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="renewal-cycle" className="text-[13px] font-medium text-grey-600">
-            갱신 주기
-          </label>
-          <select
-            id="renewal-cycle"
-            value={cycle}
-            onChange={(event) => setCycle(event.target.value as RenewalCycle)}
-            className={SELECT_CLASS}
-          >
-            {Object.entries(CYCLE_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label="갱신 주기"
+          value={cycle}
+          options={Object.entries(CYCLE_LABELS).map(([value, label]) => ({ value, label }))}
+          onChange={(event) => setCycle(event.target.value as RenewalCycle)}
+        />
 
         <Input
           label="며칠 전부터 알려드릴까요"
