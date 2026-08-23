@@ -1,5 +1,6 @@
 package io.aetera.model.renewal
 
+import io.aetera.model.common.UserOwned
 import io.aetera.model.user.UserId
 import io.aetera.shared.error.CoreException
 import io.aetera.shared.error.ensure
@@ -8,7 +9,7 @@ import java.time.LocalDate
 
 class Renewal private constructor(
     val id: RenewalId,
-    val userId: UserId,
+    override val userId: UserId,
     title: String,
     category: RenewalCategory,
     expiresAt: LocalDate,
@@ -16,7 +17,7 @@ class Renewal private constructor(
     noticeDays: Int,
     memo: String?,
     val createdAt: Instant,
-) {
+) : UserOwned {
     var title: String = title
         private set
 

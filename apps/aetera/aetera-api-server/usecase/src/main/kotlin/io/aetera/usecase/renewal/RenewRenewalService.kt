@@ -1,8 +1,10 @@
 package io.aetera.usecase.renewal
 
+import io.aetera.model.renewal.RenewalErrorCode
 import io.aetera.model.renewal.RenewalId
 import io.aetera.model.renewal.RenewalRepository
 import io.aetera.model.user.UserId
+import io.aetera.usecase.common.orNotFound
 import io.aetera.usecase.common.today
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +25,8 @@ class RenewRenewalService(
         nextExpiresAt: LocalDate?,
     ): RenewalDto {
         val today = clock.today()
-        val renewal = renewalRepository.getOwnedOrThrow(RenewalId(renewalId), UserId(userId))
+        val id = RenewalId(renewalId)
+        val renewal = renewalRepository.getById(id).orNotFound(UserId(userId), RenewalErrorCode.RENEWAL_NOT_FOUND, id)
 
         // 날짜를 직접 고르면 그 값으로, 아니면 주기가 정한 다음 만기로 굴린다.
         if (nextExpiresAt == null) {

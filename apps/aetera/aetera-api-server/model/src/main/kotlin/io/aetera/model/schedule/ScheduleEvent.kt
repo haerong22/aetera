@@ -1,5 +1,6 @@
 package io.aetera.model.schedule
 
+import io.aetera.model.common.UserOwned
 import io.aetera.model.user.UserId
 import io.aetera.shared.error.CoreException
 import io.aetera.shared.error.ensure
@@ -13,7 +14,7 @@ import java.time.Instant
  */
 class ScheduleEvent private constructor(
     val id: ScheduleEventId,
-    val userId: UserId,
+    override val userId: UserId,
     title: String,
     description: String?,
     startsAt: Instant,
@@ -21,7 +22,7 @@ class ScheduleEvent private constructor(
     allDay: Boolean,
     color: String?,
     val createdAt: Instant,
-) {
+) : UserOwned {
     var title: String = title
         private set
 

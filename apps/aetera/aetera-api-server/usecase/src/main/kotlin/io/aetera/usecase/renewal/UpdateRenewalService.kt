@@ -1,8 +1,10 @@
 package io.aetera.usecase.renewal
 
+import io.aetera.model.renewal.RenewalErrorCode
 import io.aetera.model.renewal.RenewalId
 import io.aetera.model.renewal.RenewalRepository
 import io.aetera.model.user.UserId
+import io.aetera.usecase.common.orNotFound
 import io.aetera.usecase.common.today
 import io.aetera.usecase.renewal.cmd.SaveRenewalCommand
 import org.springframework.stereotype.Service
@@ -20,7 +22,8 @@ class UpdateRenewalService(
         renewalId: UUID,
         command: SaveRenewalCommand,
     ): RenewalDto {
-        val renewal = renewalRepository.getOwnedOrThrow(RenewalId(renewalId), UserId(command.userId))
+        val id = RenewalId(renewalId)
+        val renewal = renewalRepository.getById(id).orNotFound(UserId(command.userId), RenewalErrorCode.RENEWAL_NOT_FOUND, id)
         renewal.update(
             title = command.title,
             category = command.category,

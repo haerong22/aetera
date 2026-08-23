@@ -1,8 +1,10 @@
 package io.aetera.usecase.renewal
 
+import io.aetera.model.renewal.RenewalErrorCode
 import io.aetera.model.renewal.RenewalId
 import io.aetera.model.renewal.RenewalRepository
 import io.aetera.model.user.UserId
+import io.aetera.usecase.common.orNotFound
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -16,6 +18,11 @@ class DeleteRenewalService(
         userId: UUID,
         renewalId: UUID,
     ) {
-        renewalRepository.delete(renewalRepository.getOwnedOrThrow(RenewalId(renewalId), UserId(userId)))
+        val id = RenewalId(renewalId)
+        val renewal =
+            renewalRepository
+                .getById(id)
+                .orNotFound(UserId(userId), RenewalErrorCode.RENEWAL_NOT_FOUND, id)
+        renewalRepository.delete(renewal)
     }
 }
