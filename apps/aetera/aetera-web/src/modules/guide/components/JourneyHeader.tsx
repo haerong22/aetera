@@ -5,6 +5,7 @@ import { CalendarDays, PartyPopper, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Dialog } from "@/components/ui/Dialog";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { cn } from "@/components/ui/cn";
 import type { GuideJourney, GuideProgress } from "../api";
 import { formatDDay, formatKoreanDate } from "../dates";
@@ -117,22 +118,7 @@ export function JourneyHeader({
             전체 {progress.done}/{progress.total}
           </span>
         </div>
-        <div
-          role="progressbar"
-          aria-valuenow={percent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="필수 항목 진행률"
-          className="h-2 w-full overflow-hidden rounded-full bg-grey-100"
-        >
-          <div
-            className={cn(
-              "h-full rounded-full transition-[width] duration-300",
-              completed ? "bg-success" : "bg-primary",
-            )}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
+        <ProgressBar percent={percent} label="필수 항목" done={completed} className="h-2 w-full" />
       </div>
 
       <Dialog open={confirmingReset} onClose={() => setConfirmingReset(false)} title="처음부터 다시 할까요?">
