@@ -48,7 +48,15 @@ class ErrorCodeTest {
     @Test
     fun `에러 코드 enum 을 클래스패스에서 모두 찾는다`() {
         assertThat(errorCodeEnums.map { it.simpleName })
-            .contains("UserErrorCode", "AuthErrorCode", "ModuleErrorCode", "ScheduleErrorCode", "GuideErrorCode", "RenewalErrorCode")
+            .contains(
+                "UserErrorCode",
+                "AuthErrorCode",
+                "ModuleErrorCode",
+                "ScheduleErrorCode",
+                "GuideErrorCode",
+                "RenewalErrorCode",
+                "GoalErrorCode",
+            )
     }
 
     /**

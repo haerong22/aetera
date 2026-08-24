@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useMyModules } from "@/modules/useMyModules";
 import { useScheduleEvents } from "@/modules/schedule/api";
 import { SCHEDULE_MODULE_ID } from "@/modules/schedule/id";
+import { GOAL_MODULE_ID } from "@/modules/goal/id";
 import { endOfDay, startOfDay } from "@/modules/schedule/calendar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -29,6 +30,7 @@ export default function DashboardPage() {
   const [checkedPriorities, setCheckedPriorities] = useState(0);
 
   const scheduleEnabled = modules?.some((module) => module.id === SCHEDULE_MODULE_ID && module.enabled) ?? false;
+  const goalEnabled = modules?.some((module) => module.id === GOAL_MODULE_ID && module.enabled) ?? false;
 
   // 하루 경계 시각이라 렌더마다 같은 ISO 문자열이 나온다. 쿼리 키가 문자열이므로 메모가 필요 없다.
   const now = new Date();
@@ -72,7 +74,7 @@ export default function DashboardPage() {
 
       {/* 모바일에선 목표가 라이프보다 먼저, 데스크톱에선 라이프(7) + 목표(5) 순서 */}
       <div className="lg:order-6 lg:col-span-5">
-        <WeeklyGoalsCard />
+        <WeeklyGoalsCard enabled={goalEnabled} />
       </div>
 
       <div className="lg:order-5 lg:col-span-7">
