@@ -5,8 +5,8 @@ import { useMyModules, useToggleModule } from "@/modules/useMyModules";
 import { moduleById } from "@/modules/registry";
 import type { ModuleSummary } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Switch } from "@/components/ui/Switch";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 
@@ -34,16 +34,18 @@ function ModuleCard({ module }: { module: ModuleSummary }) {
           </p>
         )}
       </div>
-      <div className="flex shrink-0 flex-col items-end gap-1">
-        <Button
-          size="sm"
-          variant={module.enabled ? "ghost" : "primary"}
+      <div className="flex shrink-0 flex-col items-end gap-1.5">
+        <Switch
+          checked={module.enabled}
           disabled={toggle.isPending}
-          onClick={() => toggle.mutate({ moduleId: module.id, enable: !module.enabled })}
-        >
-          {module.enabled ? "사용 중지" : "사용하기"}
-        </Button>
-        {toggle.isError && <span className="text-[12px] text-danger">변경하지 못했어요</span>}
+          label={`${module.displayName} 사용`}
+          onChange={(enable) => toggle.mutate({ moduleId: module.id, enable })}
+        />
+        {toggle.isError && (
+          <span role="alert" className="text-[12px] text-danger">
+            변경하지 못했어요
+          </span>
+        )}
       </div>
     </Card>
   );
