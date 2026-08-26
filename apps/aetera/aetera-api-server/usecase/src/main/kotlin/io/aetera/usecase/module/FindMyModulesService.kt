@@ -15,6 +15,6 @@ class FindMyModulesService(
     /** 배포된 모든 모듈에 나의 사용 상태를 얹어서 돌려준다 — 모듈 스토어와 사이드바가 쓴다. */
     fun findMyModules(userId: UUID): List<ModuleSummaryDto> {
         val enrollments = moduleEnrollmentRepository.findAllByUserId(UserId(userId)).associateBy { it.moduleId }
-        return moduleRegistry.descriptors.map { ModuleSummaryDto(it, enrollments[it.id]) }
+        return moduleRegistry.descriptors.toSidebarOrder(enrollments)
     }
 }
