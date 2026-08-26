@@ -29,11 +29,14 @@ class ModuleEnrollmentJpaEntity(
     var enabledAt: Instant,
     @Column(name = "disabled_at")
     var disabledAt: Instant?,
+    @Column(name = "sort_order", nullable = false)
+    var sortOrder: Int,
 ) : UuidJpaEntity(uid) {
     fun applyFrom(enrollment: ModuleEnrollment) {
         status = enrollment.status
         enabledAt = enrollment.enabledAt
         disabledAt = enrollment.disabledAt
+        sortOrder = enrollment.sortOrder
     }
 
     fun toModel(): ModuleEnrollment = ModuleEnrollment.reconstitute(
@@ -43,6 +46,7 @@ class ModuleEnrollmentJpaEntity(
         status = status,
         enabledAt = enabledAt,
         disabledAt = disabledAt,
+        sortOrder = sortOrder,
     )
 
     companion object {
@@ -53,6 +57,7 @@ class ModuleEnrollmentJpaEntity(
             status = enrollment.status,
             enabledAt = enrollment.enabledAt,
             disabledAt = enrollment.disabledAt,
+            sortOrder = enrollment.sortOrder,
         )
     }
 }

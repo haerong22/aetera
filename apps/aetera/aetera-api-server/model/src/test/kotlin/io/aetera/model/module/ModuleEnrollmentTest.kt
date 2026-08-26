@@ -68,4 +68,36 @@ class ModuleEnrollmentTest :
                 sut.enabledAt shouldBe now // 이미 활성 — 시각이 덮이지 않는다
             }
         }
+
+        describe("순서") {
+            it("처음 활성화하면 순서를 정한 적 없는 자리에 놓인다") {
+                enrollment().sortOrder shouldBe ModuleEnrollment.DEFAULT_SORT_ORDER
+            }
+
+            it("순서만 정한 모듈에는 사용 이력이 남지 않는다") {
+                val sut =
+                    ModuleEnrollment.forOrder(
+                        id = ModuleEnrollmentId.next(),
+                        userId = UserId.next(),
+                        moduleId = ModuleId("schedule"),
+                        at = now,
+                        sortOrder = 3,
+                    )
+
+                sut.isEnabled shouldBe false
+                sut.sortOrder shouldBe 3
+                // 켰다가 끈 것과 구분된다 — 끈 시각이 없다.
+                sut.disabledAt.shouldBeNull()
+            }
+
+            it("순서를 바꿔도 켜짐 상태는 그대로다") {
+                val sut = enrollment()
+
+                sut.changeSortOrder(0)
+
+                sut.sortOrder shouldBe 0
+                sut.isEnabled shouldBe true
+                sut.enabledAt shouldBe now
+            }
+        }
     })

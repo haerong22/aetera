@@ -16,6 +16,7 @@ class ModuleEnrollment private constructor(
     status: EnrollmentStatus,
     enabledAt: Instant,
     disabledAt: Instant?,
+    sortOrder: Int,
 ) {
     var status: EnrollmentStatus = status
         private set
@@ -25,6 +26,18 @@ class ModuleEnrollment private constructor(
 
     var disabledAt: Instant? = disabledAt
         private set
+
+    /**
+     * 사이드바에 놓이는 순서. 작을수록 위다.
+     *
+     * 켜짐/꺼짐과 같은 "내 모듈 구성"이라 같은 행에 둔다 — 기기를 바꿔도 순서가 따라와야 한다.
+     */
+    var sortOrder: Int = sortOrder
+        private set
+
+    fun changeSortOrder(sortOrder: Int) {
+        this.sortOrder = sortOrder
+    }
 
     val isEnabled: Boolean get() = status == EnrollmentStatus.ENABLED
 
@@ -49,6 +62,9 @@ class ModuleEnrollment private constructor(
     override fun toString(): String = "ModuleEnrollment(userId=$userId, moduleId=$moduleId, status=$status)"
 
     companion object {
+        /** 순서를 정한 적 없는 모듈은 뒤로 보낸다 — 새로 켠 모듈이 기존 배치를 흔들지 않는다. */
+        const val DEFAULT_SORT_ORDER: Int = 1_000
+
         fun enable(
             id: ModuleEnrollmentId,
             userId: UserId,
@@ -61,6 +77,29 @@ class ModuleEnrollment private constructor(
             status = EnrollmentStatus.ENABLED,
             enabledAt = at,
             disabledAt = null,
+            sortOrder = DEFAULT_SORT_ORDER,
+        )
+
+        /**
+         * 켠 적 없는 모듈의 순서만 정해 둔다.
+         *
+         * [enable] 로 만들었다가 곧바로 [disable] 하면 켠 적 없는 모듈에 사용 이력이 남는다.
+         * "한 번도 안 켰다"와 "켰다가 껐다"는 다른 사실이므로 생성 경로를 나눈다.
+         */
+        fun forOrder(
+            id: ModuleEnrollmentId,
+            userId: UserId,
+            moduleId: ModuleId,
+            at: Instant,
+            sortOrder: Int,
+        ): ModuleEnrollment = ModuleEnrollment(
+            id = id,
+            userId = userId,
+            moduleId = moduleId,
+            status = EnrollmentStatus.DISABLED,
+            enabledAt = at,
+            disabledAt = null,
+            sortOrder = sortOrder,
         )
 
         fun reconstitute(
@@ -70,6 +109,7 @@ class ModuleEnrollment private constructor(
             status: EnrollmentStatus,
             enabledAt: Instant,
             disabledAt: Instant?,
-        ): ModuleEnrollment = ModuleEnrollment(id, userId, moduleId, status, enabledAt, disabledAt)
+            sortOrder: Int,
+        ): ModuleEnrollment = ModuleEnrollment(id, userId, moduleId, status, enabledAt, disabledAt, sortOrder)
     }
 }

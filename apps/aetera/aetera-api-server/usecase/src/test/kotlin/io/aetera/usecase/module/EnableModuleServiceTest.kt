@@ -72,6 +72,7 @@ class EnableModuleServiceTest :
                         status = EnrollmentStatus.DISABLED,
                         enabledAt = now.minusSeconds(86_400),
                         disabledAt = now.minusSeconds(3600),
+                        sortOrder = ModuleEnrollment.DEFAULT_SORT_ORDER,
                     )
                 every { enrollmentRepository.getByUserIdAndModuleId(userId, ModuleId("schedule")) } returns dormant
 
