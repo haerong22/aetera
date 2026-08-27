@@ -1,4 +1,5 @@
-import { Compass, History, Puzzle, Settings, Sparkles, Sun, Target, type LucideIcon } from "lucide-react";
+import { Compass, History, Puzzle, Settings, Sparkles, Sun, type LucideIcon } from "lucide-react";
+import { sortByIdOrder } from "@/lib/order";
 import { frontendModules } from "@/modules/registry";
 import { modulePath } from "@/modules/types";
 
@@ -15,26 +16,43 @@ export interface NavEntry {
   moduleId?: string;
 }
 
+/** 모듈보다 위에 고정되는 코어 메뉴. */
+const NAV_TOP: NavEntry[] = [{ key: "today", label: "오늘", icon: Sun, href: "/dashboard" }];
+
+/** 아직 만들지 않은 기능의 자리. 순서를 바꿀 대상이 아니라 모듈 아래에 고정한다. */
+const NAV_PLANNED: NavEntry[] = [
+  { key: "timeline", label: "타임라인", icon: History },
+  { key: "coach", label: "AI 코치", icon: Sparkles },
+  { key: "life", label: "라이프", icon: Compass },
+];
+
+const NAV_BOTTOM: NavEntry[] = [
+  { key: "modules", label: "모듈", icon: Puzzle, href: "/settings/modules" },
+];
+
 /**
  * 주요 메뉴. 모듈 메뉴는 레지스트리에서 만들어 넣는다 —
  * 여기에 손으로 적으면 모듈 정의와 두 벌이 되어 조용히 어긋난다.
- * 라우트가 생긴 코어 메뉴는 href 만 채우면 된다.
+ *
+ * 모듈 순서는 사용자가 정한다([orderedModuleIds]). 목록에 없는 모듈은 뒤에 붙여
+ * 새로 배포된 모듈이 사라지지 않게 한다.
  */
-export const MAIN_NAV: NavEntry[] = [
-  { key: "today", label: "오늘", icon: Sun, href: "/dashboard" },
-  ...frontendModules.map((module) => ({
-    key: module.id,
-    label: module.title,
-    icon: module.icon,
-    href: modulePath(module.id),
-    moduleId: module.id,
-  })),
-  { key: "timeline", label: "타임라인", icon: History },
-  { key: "goals", label: "목표", icon: Target },
-  { key: "coach", label: "AI 코치", icon: Sparkles },
-  { key: "life", label: "라이프", icon: Compass },
-  { key: "modules", label: "모듈", icon: Puzzle, href: "/settings/modules" },
-];
+export function buildMainNav(orderedModuleIds: readonly string[]): NavEntry[] {
+  const modules = sortByIdOrder(frontendModules, orderedModuleIds, (module) => module.id);
+
+  return [
+    ...NAV_TOP,
+    ...modules.map((module) => ({
+      key: module.id,
+      label: module.title,
+      icon: module.icon,
+      href: modulePath(module.id),
+      moduleId: module.id,
+    })),
+    ...NAV_PLANNED,
+    ...NAV_BOTTOM,
+  ];
+}
 
 /** 하단 고정 메뉴. */
 export const FOOTER_NAV: NavEntry[] = [{ key: "settings", label: "설정", icon: Settings }];

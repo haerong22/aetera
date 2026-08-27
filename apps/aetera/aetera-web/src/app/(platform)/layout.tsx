@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useMyModules } from "@/modules/useMyModules";
-import { FOOTER_NAV, MAIN_NAV, isNavActive } from "@/components/layout/nav";
+import { FOOTER_NAV, buildMainNav, isNavActive } from "@/components/layout/nav";
 import { SidebarNavItem } from "@/components/layout/SidebarNavItem";
 import { PageSpinner } from "@/components/ui/Spinner";
 
@@ -26,7 +26,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   // 모듈이 받치는 메뉴는 그 모듈을 켠 사용자에게만 보인다.
   // 모듈 목록을 아직 못 받았으면 성급히 숨기지 않는다(깜빡임 방지) — 접근 차단은 서버 가드의 몫이다.
-  const visibleNav = MAIN_NAV.filter((entry) => {
+  const mainNav = buildMainNav(modules?.map((module) => module.id) ?? []);
+  const visibleNav = mainNav.filter((entry) => {
     if (!entry.moduleId || !modules) return true;
     return modules.some((module) => module.id === entry.moduleId && module.enabled);
   });

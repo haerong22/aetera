@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
+import { sortByIdOrder } from "@/lib/order";
 import { moduleById } from "@/modules/registry";
 import type { ModuleSummary } from "@/lib/types";
 
@@ -30,5 +31,39 @@ export function useToggleModule() {
       const prefix = moduleById.get(updated.id)?.queryKeyPrefix;
       if (prefix) queryClient.removeQueries({ queryKey: [prefix] });
     },
+  });
+}
+
+/**
+ * 사이드바 순서를 바꾼다.
+ *
+ * 화면이 이미 계산한 최종 순서를 통째로 보낸다 — "한 칸 위로" 같은 부분 요청으로 두면
+ * 서버가 나머지를 어떻게 밀지 정해야 하고, 그 규칙이 화면과 어긋나면 순서가 튄다.
+ *
+ * 순서는 즉시 반영한다. 화살표를 눌렀는데 목록이 안 움직이면 눌리지 않은 줄 안다.
+ */
+export function useReorderModules() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (moduleIds: string[]) =>
+      apiFetch<ModuleSummary[]>("/api/v1/me/modules/order", {
+        method: "PUT",
+        body: JSON.stringify({ moduleIds }),
+      }),
+    onMutate: async (moduleIds) => {
+      await queryClient.cancelQueries({ queryKey: MY_MODULES_KEY });
+      const previous = queryClient.getQueryData<ModuleSummary[]>(MY_MODULES_KEY);
+      if (previous) {
+        queryClient.setQueryData<ModuleSummary[]>(
+          MY_MODULES_KEY,
+          sortByIdOrder(previous, moduleIds, (module) => module.id),
+        );
+      }
+      return { previous };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(MY_MODULES_KEY, context.previous);
+    },
+    onSuccess: (updated) => queryClient.setQueryData(MY_MODULES_KEY, updated),
   });
 }
