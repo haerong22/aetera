@@ -1,7 +1,15 @@
 "use client";
 
-import { useId, useState } from "react";
-import { AlertCircle, CalendarPlus, ExternalLink, MessageSquarePlus, Trash2 } from "lucide-react";
+import { useId, useState, type ComponentType } from "react";
+import {
+  AlertCircle,
+  CalendarPlus,
+  Calculator,
+  ChevronDown,
+  ExternalLink,
+  MessageSquarePlus,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import type { GuideTask, TaskPatch } from "../api";
@@ -11,16 +19,22 @@ export function TaskItem({
   started,
   failed,
   onAddToCalendar,
+  Tool,
   onChange,
 }: {
   task: GuideTask;
   started: boolean;
   failed: boolean;
   onAddToCalendar?: () => void;
+  /** 이 할 일에 딸린 도구. 엔진은 무엇인지 모르고 자리만 내준다. */
+  Tool?: ComponentType;
   onChange: (patch: TaskPatch) => void;
 }) {
   const checkboxId = useId();
+  const toolPanelId = useId();
   const [editingNote, setEditingNote] = useState<string | null>(null);
+  // 기본은 접어 둔다 — 계산기가 펼쳐져 있으면 목록을 훑는 흐름이 끊긴다.
+  const [toolOpen, setToolOpen] = useState(false);
 
   function saveNote() {
     const note = editingNote?.trim() ?? "";
@@ -107,7 +121,31 @@ export function TaskItem({
               캘린더에 추가
             </button>
           )}
+
+          {Tool && (
+            <button
+              type="button"
+              aria-expanded={toolOpen}
+              aria-controls={toolPanelId}
+              onClick={() => setToolOpen((previous) => !previous)}
+              className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary transition-colors hover:text-primary-hover"
+            >
+              <Calculator size={14} aria-hidden />
+              계산해 보기
+              <ChevronDown
+                size={13}
+                aria-hidden
+                className={cn("transition-transform duration-200", toolOpen && "rotate-180")}
+              />
+            </button>
+          )}
         </div>
+
+        {Tool && toolOpen && (
+          <div id={toolPanelId} className="mt-3">
+            <Tool />
+          </div>
+        )}
 
         {task.note && editingNote === null && (
           <div className="mt-2 flex items-start gap-2 rounded-xl bg-grey-50 px-3 py-2">

@@ -15,11 +15,20 @@ import {
   type GuideTask,
   type TaskPatch,
 } from "./api";
+import type { TaskToolMap } from "./types";
 import { JourneyHeader } from "./components/JourneyHeader";
 import { PhaseSection } from "./components/PhaseSection";
 import { StartJourneyCard } from "./components/StartJourneyCard";
 
-export function GuidePage({ moduleTitle, guideId }: { moduleTitle: string; guideId: string }) {
+export function GuidePage({
+  moduleTitle,
+  guideId,
+  taskTools,
+}: {
+  moduleTitle: string;
+  guideId: string;
+  taskTools?: TaskToolMap;
+}) {
   const { data: guide, error, refetch } = useGuide(guideId);
   const setAnchorDate = useSetAnchorDate(guideId);
   const resetJourney = useResetJourney(guideId);
@@ -100,6 +109,7 @@ export function GuidePage({ moduleTitle, guideId }: { moduleTitle: string; guide
             started={started}
             failedTaskKeys={failedTaskKeys}
             canAddToCalendar={started && AddEventDialog !== null}
+            taskTools={taskTools}
             onChangeTask={changeTask}
             onAddToCalendar={addTaskToCalendar}
           />

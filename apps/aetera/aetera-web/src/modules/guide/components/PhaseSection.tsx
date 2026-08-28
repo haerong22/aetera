@@ -5,6 +5,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/components/ui/cn";
 import type { GuidePhase, GuideTask, TaskPatch } from "../api";
+import type { TaskToolMap } from "../types";
 import { TaskItem } from "./TaskItem";
 
 export function PhaseSection({
@@ -13,6 +14,7 @@ export function PhaseSection({
   started,
   failedTaskKeys,
   canAddToCalendar,
+  taskTools,
   onChangeTask,
   onAddToCalendar,
 }: {
@@ -21,6 +23,7 @@ export function PhaseSection({
   started: boolean;
   failedTaskKeys: ReadonlySet<string>;
   canAddToCalendar: boolean;
+  taskTools?: TaskToolMap;
   onChangeTask: (taskKey: string, patch: TaskPatch) => void;
   onAddToCalendar: (task: GuideTask) => void;
 }) {
@@ -75,6 +78,7 @@ export function PhaseSection({
               onAddToCalendar={
                 canAddToCalendar && task.dueDate && !task.done ? () => onAddToCalendar(task) : undefined
               }
+              Tool={taskTools?.[task.key]}
               onChange={(patch) => onChangeTask(task.key, patch)}
             />
           ))}
