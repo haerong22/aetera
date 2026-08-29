@@ -21,7 +21,6 @@ private object ResignationLinks {
     val NHIS = GuideLink("국민건강보험공단", "https://www.nhis.or.kr")
     val NPS = GuideLink("국민연금공단", "https://www.nps.or.kr")
     val MOEL = GuideLink("고용노동부", "https://www.moel.go.kr")
-    val HOMETAX = GuideLink("국세청 홈택스", "https://www.hometax.go.kr")
     val FOUR_INSURE = GuideLink("4대사회보험 정보연계센터", "https://www.4insure.or.kr")
 }
 
@@ -267,7 +266,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "근로소득·퇴직소득 원천징수영수증은 이직한 회사의 연말정산과 종합소득세 신고에 필요해요. " +
                                         "홈택스에서도 조회되지만 반영이 늦을 수 있으니 회사에서 받아 두면 확실해요.",
                                 dueOffsetDays = 30,
-                                link = ResignationLinks.HOMETAX,
+                                link = SharedLinks.HOMETAX,
                             ),
                             task(
                                 key = "career-cert",
