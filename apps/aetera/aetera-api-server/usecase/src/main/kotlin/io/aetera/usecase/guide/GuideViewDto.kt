@@ -24,6 +24,8 @@ data class GuideViewDto(
     val title: String,
     val summary: String,
     val anchorLabel: String,
+    /** `"12-31"`. 기준일이 달력으로 정해진 가이드에만 실린다 — 시작 화면이 이 날짜를 미리 채운다. */
+    val anchorMonthDay: String?,
     val disclaimer: String,
     /** null 이면 아직 시작하지 않은 가이드 — 오류가 아니라 정상적인 시작 전 상태다. */
     val journey: GuideJourneyDto?,
@@ -43,6 +45,7 @@ data class GuideViewDto(
                 title = template.title,
                 summary = template.summary,
                 anchorLabel = template.anchorLabel,
+                anchorMonthDay = template.anchorMonthDay?.let { "%02d-%02d".format(it.monthValue, it.dayOfMonth) },
                 disclaimer = template.disclaimer,
                 journey = journey?.let(GuideJourneyDto::of),
                 phases = phases,

@@ -93,6 +93,7 @@ export function GuidePage({
       ) : (
         <StartJourneyCard
           anchorLabel={guide.anchorLabel}
+          anchorMonthDay={guide.anchorMonthDay}
           taskCount={guide.progress.total}
           pending={setAnchorDate.isPending}
           failed={setAnchorDate.isError}

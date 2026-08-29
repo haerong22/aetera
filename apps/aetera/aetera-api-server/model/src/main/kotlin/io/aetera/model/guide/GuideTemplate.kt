@@ -1,6 +1,7 @@
 package io.aetera.model.guide
 
 import java.time.LocalDate
+import java.time.MonthDay
 
 /**
  * 가이드 콘텐츠. **사용자별 데이터가 아니라 배포물이다** — 모듈이 코드로 존재하듯 콘텐츠도 코드로 존재한다.
@@ -18,6 +19,17 @@ data class GuideTemplate(
     val summary: String,
     /** 모든 마감의 기준이 되는 날짜의 이름. 퇴사 가이드라면 "퇴사 예정일". */
     val anchorLabel: String,
+    /**
+     * 기준일이 달력으로 정해져 있는 가이드라면 그 월·일.
+     *
+     * 퇴사·이사는 사용자가 날을 고르지만 연말정산은 12월 31일이 기준이다. 아무 날이나 고르게 두면
+     * "12월 31일까지 납입" 같은 항목이 엉뚱한 날로 흩어지므로, 시작 화면이 이 날짜를 미리 채운다.
+     *
+     * **연도는 여기서 정하지 않는다.** "가장 가까운 12월 31일"은 사용자의 오늘을 알아야 하는데
+     * 서버는 그걸 모른다([GuideTask.dueDateFrom] 의 마감을 내려보내지 않는 것과 같은 이유).
+     * 규칙만 주고 연도는 브라우저가 자기 달력으로 맞춘다.
+     */
+    val anchorMonthDay: MonthDay? = null,
     /** 법·회사 규정처럼 상황에 따라 달라지는 부분에 대한 고지. 화면 하단에 그대로 노출한다. */
     val disclaimer: String,
     val phases: List<GuidePhase>,

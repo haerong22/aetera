@@ -43,6 +43,8 @@ export interface GuideView {
   title: string;
   summary: string;
   anchorLabel: string;
+  /** `"12-31"`. 달력이 기준일을 정하는 가이드에만 실린다. 연도는 브라우저가 자기 달력으로 맞춘다. */
+  anchorMonthDay?: string;
   disclaimer: string;
   journey?: GuideJourney;
   phases: GuidePhase[];

@@ -2,18 +2,21 @@
 
 import { Flag } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { isoFromToday } from "@/lib/date";
+import { isoFromToday, nearestIsoOccurrence } from "@/lib/date";
 import { AnchorDateForm } from "./AnchorDateForm";
 
 /** 기준일을 정하기 전. 아래에 단계 미리보기가 이어지므로 여기서는 "왜 날짜부터인지"만 말한다. */
 export function StartJourneyCard({
   anchorLabel,
+  anchorMonthDay,
   taskCount,
   pending,
   failed,
   onStart,
 }: {
   anchorLabel: string;
+  /** 달력이 기준일을 정하는 가이드(연말정산의 12월 31일)라면 그 월·일. */
+  anchorMonthDay?: string;
   taskCount: number;
   pending: boolean;
   failed: boolean;
@@ -39,7 +42,7 @@ export function StartJourneyCard({
 
       <AnchorDateForm
         anchorLabel={anchorLabel}
-        initialValue={isoFromToday(30)}
+        initialValue={anchorMonthDay ? nearestIsoOccurrence(anchorMonthDay) : isoFromToday(30)}
         submitLabel="시작하기"
         pending={pending}
         failed={failed}
