@@ -6,6 +6,7 @@ import io.aetera.model.guide.GuideModule
 import io.aetera.model.guide.GuideTemplate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 /**
@@ -16,17 +17,32 @@ import java.time.LocalDate
  * 오프셋 부호를 반대로 적거나, 필수 표시를 빠뜨리는 실수는 컴파일러가 잡아주지 않는다.
  */
 class GuideContentTest {
-    private val guides: List<GuideTemplate> =
+    private val guideModules: List<Class<*>> =
         ClassFileImporter()
             .withImportOption(ImportOption.DoNotIncludeTests())
             .importPackages(ROOT_PACKAGE)
             .filter { it.isAssignableTo(GuideModule::class.java) && !it.isInterface }
-            .map { it.reflect().getDeclaredConstructor().newInstance() as GuideModule }
-            .map { it.template }
+            .map { it.reflect() }
 
+    private val guides: List<GuideTemplate> =
+        guideModules.map { (it.getDeclaredConstructor().newInstance() as GuideModule).template }
+
+    /**
+     * 아이디를 손으로 늘어놓지 않는다 — 새 가이드를 추가할 때 그 목록을 고치는 걸 잊으면
+     * 이 파일이 없애려던 "가이드마다 손으로 관리하는 목록"이 그대로 생긴다.
+     *
+     * 대신 새 가이드에서 실제로 나는 실수를 본다: 콘텐츠를 다 써 놓고 `@Component` 를 빠뜨리면
+     * **아래 규칙 테스트는 전부 통과하는데** 카탈로그에는 안 들어가 화면에서만 사라진다.
+     */
     @Test
-    fun `가이드를 클래스패스에서 모두 찾는다`() {
-        assertThat(guides.map { it.id.value }).contains("resignation", "moving")
+    fun `클래스패스에서 찾은 가이드는 전부 빈으로 등록되어 있다`() {
+        assertThat(guides).isNotEmpty
+
+        guideModules.forEach { module ->
+            assertThat(module.isAnnotationPresent(Component::class.java))
+                .withFailMessage { "가이드 '${module.simpleName}' 에 @Component 가 없어 카탈로그에 등록되지 않는다" }
+                .isTrue()
+        }
     }
 
     @Test
