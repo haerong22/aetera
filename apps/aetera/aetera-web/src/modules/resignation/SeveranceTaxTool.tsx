@@ -5,7 +5,7 @@ import { Info, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/components/ui/cn";
-import { inKoreanUnits, won } from "./money";
+import { inKoreanUnits, won } from "@/lib/money";
 import { estimateSeveranceTax, type SeveranceTax, type SeveranceTaxResult } from "./severanceTax";
 
 const HOW_IT_IS_TAXED = [

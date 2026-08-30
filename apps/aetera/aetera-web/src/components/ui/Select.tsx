@@ -9,6 +9,16 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: ReadonlyArray<{ value: string; label: string }>;
 }
 
+/**
+ * `{ MONTHLY: "매월", YEARLY: "매년" }` 같은 라벨 표를 [Select] 가 받는 배열로 바꾼다.
+ *
+ * 모듈마다 이 한 줄을 다시 적고 있었다. 값-라벨 표는 모듈이 갖되, 그걸 배열로 펴는 방식은
+ * Select 를 쓰는 모두가 같아야 순서 규칙이 한곳에 남는다.
+ */
+export function optionsFrom(labels: Record<string, string>): ReadonlyArray<{ value: string; label: string }> {
+  return Object.entries(labels).map(([value, label]) => ({ value, label }));
+}
+
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { label, options, className, id: idProp, ...props },
   ref,

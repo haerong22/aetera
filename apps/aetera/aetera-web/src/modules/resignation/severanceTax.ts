@@ -12,7 +12,7 @@
  * 옛 계산식처럼 개인 이력을 알아야 하는 항목은 넣지 않았다. 화면은 이 사실을 함께 보여준다.
  */
 
-import { inKoreanUnits } from "./money";
+import { inKoreanUnits } from "@/lib/money";
 
 /** 사람이 실수로 0을 몇 개 더 붙였을 때 말이 되는 답을 내놓지 않기 위한 상한. */
 const MAX_AMOUNT = 1_000_000_000_000;

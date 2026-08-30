@@ -5,6 +5,7 @@ import { movingModule } from "./moving";
 import { yearEndTaxModule } from "./year-end-tax";
 import { renewalModule } from "./renewal";
 import { goalModule } from "./goal";
+import { expenseModule } from "./expense";
 
 /**
  * 배포된 프론트엔드 모듈의 목록. 새 모듈은 여기 한 줄을 추가하면
@@ -20,6 +21,7 @@ export const frontendModules: FrontendModule[] = [
   yearEndTaxModule,
   renewalModule,
   goalModule,
+  expenseModule,
 ];
 
 export const moduleById: ReadonlyMap<string, FrontendModule> = new Map(
