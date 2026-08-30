@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { Select, optionsFrom } from "@/components/ui/Select";
 import { PERIOD_LABELS, useCreateGoal, useDeleteGoal, useUpdateGoal, type Goal, type GoalPeriod } from "../api";
 
 export function GoalDialog({
@@ -64,7 +64,7 @@ export function GoalDialog({
         <Select
           label="기간"
           value={period}
-          options={Object.entries(PERIOD_LABELS).map(([value, label]) => ({ value, label }))}
+          options={optionsFrom(PERIOD_LABELS)}
           onChange={(event) => setPeriod(event.target.value as GoalPeriod)}
         />
 

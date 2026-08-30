@@ -4,8 +4,9 @@ import { useState, type FormEvent } from "react";
 import { Info, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { MoneyInput } from "@/components/ui/MoneyInput";
 import { cn } from "@/components/ui/cn";
-import { inKoreanUnits, won } from "@/lib/money";
+import { won } from "@/lib/money";
 import { estimateSeveranceTax, type SeveranceTax, type SeveranceTaxResult } from "./severanceTax";
 
 const HOW_IT_IS_TAXED = [
@@ -22,36 +23,6 @@ const HOW_IT_IS_TAXED = [
     body: "나눠 받으면 세금이 깎여요. 연금 수령 11년차부터는 60%까지 내려갑니다.",
   },
 ];
-
-function MoneyInput({
-  label,
-  value,
-  hint,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  onChange: (digits: string) => void;
-}) {
-  const amount = Number(value || "0");
-  const units = value === "" ? null : inKoreanUnits(amount);
-
-  return (
-    <div>
-      <Input
-        label={label}
-        inputMode="numeric"
-        placeholder="0"
-        value={value === "" ? "" : amount.toLocaleString("ko-KR")}
-        // 표시할 때만 쉼표를 넣고 상태에는 숫자만 담는다. 13자리면 조 단위까지 들어간다.
-        onChange={(event) => onChange(event.target.value.replace(/\D/g, "").slice(0, 13))}
-        className="text-right tabular-nums"
-      />
-      <p className="mt-1 h-4 text-[12px] text-grey-500">{units ?? hint ?? ""}</p>
-    </div>
-  );
-}
 
 function Row({
   label,

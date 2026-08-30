@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { Select, optionsFrom } from "@/components/ui/Select";
 import { isoFromToday } from "@/lib/date";
 import {
   useCreateRenewal,
@@ -83,7 +83,7 @@ export function RenewalDialog({
         <Select
           label="분류"
           value={category}
-          options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ value, label }))}
+          options={optionsFrom(CATEGORY_LABELS)}
           onChange={(event) => setCategory(event.target.value as RenewalCategory)}
         />
 
@@ -98,7 +98,7 @@ export function RenewalDialog({
         <Select
           label="갱신 주기"
           value={cycle}
-          options={Object.entries(CYCLE_LABELS).map(([value, label]) => ({ value, label }))}
+          options={optionsFrom(CYCLE_LABELS)}
           onChange={(event) => setCycle(event.target.value as RenewalCycle)}
         />
 
