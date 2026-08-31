@@ -1,0 +1,138 @@
+"use client";
+
+import { useState } from "react";
+import { Wallet } from "lucide-react";
+import { Card } from "@/components/ui/Card";
+import { MoneyInput } from "@/components/ui/MoneyInput";
+import { localToday } from "@/lib/date";
+import { won } from "@/lib/money";
+import { useMonthlyFixedCost } from "../capabilityRegistry";
+import { TaskToolPanel } from "../guide/components/TaskToolPanel";
+
+/** 한 달의 평균 길이. 개월 수를 날짜로 되돌릴 때만 쓴다. */
+const DAYS_PER_MONTH = 30.44;
+
+/**
+ * 돈이 떨어지는 달.
+ *
+ * 개월 수를 **날짜로 환산해 오늘에 더한다.** 달 단위로 더하면서 1일로 옮기면
+ * "오늘이 31일"이라는 사실과 소수부(0.8개월 ≈ 24일)가 함께 날아가 한 달이 앞당겨진다.
+ * 일 단위 덧셈은 말일 넘침도 알아서 처리한다.
+ *
+ * 날짜까지는 말하지 않는다 — "대략 몇 달"에서 나온 값이라 하루 단위로 찍으면
+ * 계산이 실제보다 정밀해 보인다.
+ */
+function formatRunsOut(months: number): string {
+  const date = localToday();
+  date.setDate(date.getDate() + Math.round(months * DAYS_PER_MONTH));
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+}
+
+function Result({ cash, monthlyBurn }: { cash: number; monthlyBurn: number }) {
+  // 나가는 돈이 없으면 답할 수 없다. 가진 돈이 0 이어도 마찬가지다.
+  if (cash <= 0 || monthlyBurn <= 0) return null;
+  const months = cash / monthlyBurn;
+
+  return (
+    <Card className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-primary/20 bg-primary-light/40">
+      <div>
+        <p className="text-[13px] font-medium text-grey-600">지금 가진 돈으로</p>
+        <p className="mt-0.5 text-[28px] leading-tight font-bold text-primary tabular-nums">
+          약 {months.toFixed(1)}개월
+        </p>
+      </div>
+      <div className="text-right">
+        <p className="text-[13px] font-medium text-grey-600">{formatRunsOut(months)}쯤 바닥</p>
+        <p className="mt-0.5 text-[13px] text-grey-600 tabular-nums">한 달 {won(monthlyBurn)}</p>
+      </div>
+    </Card>
+  );
+}
+
+/** 고정지출 모듈이 켜져 있을 때 그 값을 보여주는 자리. 아직 못 읽었으면 비워 둔다. */
+function LinkedFixedCost({ amount }: { amount: number | null }) {
+  return (
+    <div>
+      <p className="text-[13px] font-medium text-grey-600">매달 나가는 고정지출</p>
+      <p className="mt-1.5 flex h-[52px] items-center gap-1.5 rounded-(--radius-input) border border-grey-200 bg-grey-50 px-4 text-[15px] font-semibold text-grey-900 tabular-nums">
+        <Wallet size={15} aria-hidden className="text-grey-400" />
+        {amount === null ? <span className="text-grey-400">불러오는 중</span> : won(amount)}
+      </p>
+      <p className="mt-1 h-4 text-[12px] text-grey-500">고정지출 모듈에서 가져왔어요</p>
+    </div>
+  );
+}
+
+/**
+ * 다음 수입까지의 공백을 개월 수로 바꿔 본다.
+ *
+ * 고정지출 모듈을 켜 두었으면 등록해 둔 한 달 금액이 자동으로 들어온다. 꺼져 있으면
+ * 직접 적는다 — **꺼진 모듈 때문에 이 자리가 못 쓰게 되면 안 된다.**
+ */
+export function RunwayTool() {
+  const MonthlyFixedCost = useMonthlyFixedCost();
+  const linked = MonthlyFixedCost !== null;
+
+  const [cash, setCash] = useState("");
+  const [typedFixedCost, setTypedFixedCost] = useState("");
+  const [livingCost, setLivingCost] = useState("");
+
+  /**
+   * 자리를 정하는 기준은 **값이 왔는가가 아니라 모듈이 켜졌는가**다.
+   *
+   * 도구는 펼칠 때 처음 마운트되므로 고정지출 조회는 그제서야 나간다. 값으로 판단하면
+   * 응답이 오기 전 한순간 직접 입력 칸이 떴다가 사라지고, 그 사이에 친 값은 조용히 버려진다.
+   */
+  function body(linkedFixedCost: number | null) {
+    const fixedCost = linked ? linkedFixedCost : Number(typedFixedCost || "0");
+    const monthlyBurn = fixedCost === null ? null : fixedCost + Number(livingCost || "0");
+
+    return (
+      <>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <MoneyInput
+            label="지금 가진 돈"
+            value={cash}
+            hint="퇴직금은 빼고, 당장 쓸 수 있는 돈만"
+            onChange={setCash}
+          />
+
+          {linked ? (
+            <LinkedFixedCost amount={linkedFixedCost} />
+          ) : (
+            <MoneyInput
+              label="매달 나가는 고정지출"
+              value={typedFixedCost}
+              hint="월세·통신비·보험료"
+              onChange={setTypedFixedCost}
+            />
+          )}
+
+          <MoneyInput
+            label="그 밖의 생활비 (선택)"
+            value={livingCost}
+            hint="식비·교통비처럼 매달 쓰는 돈"
+            onChange={setLivingCost}
+          />
+        </div>
+
+        {monthlyBurn !== null && <Result cash={Number(cash || "0")} monthlyBurn={monthlyBurn} />}
+      </>
+    );
+  }
+
+  return (
+    <TaskToolPanel
+      title="몇 달이나 버틸 수 있는지 계산해 보기"
+      description="다음 수입까지의 공백을 개월 수로 바꿔 보면, 퇴사일을 언제로 잡을지가 훨씬 선명해져요."
+      footnote={
+        <>
+          실업급여, 퇴직금, 건강보험료 변동은 넣지 않은 숫자예요. 여유를 조금 더 잡아 두세요.
+          {!linked && " 고정지출 모듈을 켜면 등록해 둔 금액이 자동으로 들어와요."}
+        </>
+      }
+    >
+      {MonthlyFixedCost ? <MonthlyFixedCost>{body}</MonthlyFixedCost> : body(null)}
+    </TaskToolPanel>
+  );
+}

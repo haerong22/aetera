@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Info, PiggyBank } from "lucide-react";
+import { PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { MoneyInput } from "@/components/ui/MoneyInput";
 import { cn } from "@/components/ui/cn";
 import { won } from "@/lib/money";
+import { TaskToolPanel } from "../guide/components/TaskToolPanel";
 import { estimateSeveranceTax, type SeveranceTax, type SeveranceTaxResult } from "./severanceTax";
 
 const HOW_IT_IS_TAXED = [
@@ -128,9 +129,10 @@ export function SeveranceTaxTool() {
   }
 
   return (
-    <div className="rounded-(--radius-card) border border-grey-200 bg-grey-50 p-4 sm:p-5">
-      <h3 className="text-[15px] font-bold text-grey-900">IRP 를 해지하면 세금이 이렇게 붙어요</h3>
-
+    <TaskToolPanel
+      title="IRP 를 해지하면 세금이 이렇게 붙어요"
+      footnote="추정치예요. 비과세 퇴직급여, 임원 퇴직금 한도 초과분, 2012년 이전 근속분처럼 개인 이력을 알아야 하는 항목은 빠져 있어요. 실제 금액은 원천징수영수증이나 국세청 모의계산으로 확인하세요."
+    >
       <ol className="mt-3 flex flex-col gap-2.5">
         {HOW_IT_IS_TAXED.map((item, index) => (
           <li key={item.title} className="flex gap-2.5">
@@ -188,12 +190,6 @@ export function SeveranceTaxTool() {
       )}
 
       {result?.ok && <Result tax={result.tax} />}
-
-      <p className="mt-4 flex items-start gap-2 text-[12px] leading-relaxed text-grey-500">
-        <Info size={13} aria-hidden className="mt-0.5 shrink-0" />
-        추정치예요. 비과세 퇴직급여, 임원 퇴직금 한도 초과분, 2012년 이전 근속분처럼 개인 이력을 알아야
-        하는 항목은 빠져 있어요. 실제 금액은 원천징수영수증이나 국세청 모의계산으로 확인하세요.
-      </p>
-    </div>
+    </TaskToolPanel>
   );
 }
