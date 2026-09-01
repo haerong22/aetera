@@ -40,5 +40,6 @@ interface ErrorCode {
         const val RENEWAL_BAND: Int = 6 * BAND_SIZE
         const val GOAL_BAND: Int = 7 * BAND_SIZE
         const val EXPENSE_BAND: Int = 8 * BAND_SIZE
+        const val ASSET_BAND: Int = 9 * BAND_SIZE
     }
 }

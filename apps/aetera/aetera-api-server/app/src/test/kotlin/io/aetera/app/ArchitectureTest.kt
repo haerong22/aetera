@@ -15,7 +15,7 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
  * 예전에는 "schedule 이 아직 없는 패키지들을 참조하지 않는다"로 적혀 있었는데,
  * 대상이 비어 있으면 규칙이 언제나 통과해서 아무것도 지키지 않았다.
  */
-private val MODULE_PACKAGES = listOf("schedule", "guide", "renewal", "goal", "expense")
+private val MODULE_PACKAGES = listOf("schedule", "guide", "renewal", "goal", "expense", "asset")
 
 @AnalyzeClasses(
     packages = ["io.aetera"],
