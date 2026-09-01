@@ -4,7 +4,7 @@ import { useState, type DragEvent } from "react";
 import { ChevronDown, ChevronUp, GripVertical, Puzzle } from "lucide-react";
 import { useMyModules, useReorderModules, useToggleModule } from "@/modules/useMyModules";
 import { moduleById } from "@/modules/registry";
-import type { ModuleSummary } from "@/lib/types";
+import type { ModuleCategory, ModuleSummary } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Switch } from "@/components/ui/Switch";
@@ -12,6 +12,59 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { cn } from "@/components/ui/cn";
 import { sortByIdOrder } from "@/lib/order";
+
+type Filter = ModuleCategory | "ALL";
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "ALL", label: "전체" },
+  { key: "TOOL", label: "도구" },
+  { key: "GUIDE", label: "가이드" },
+];
+
+/**
+ * 종류로 걸러 보는 버튼 묶음.
+ *
+ * `role="tab"` 을 쓰지 않는다. 탭이라고 선언하면 스크린리더와 키보드 사용자가 탭 위젯의 규약을
+ * 기대한다 — 좌우 화살표로 이동하고, Tab 키로는 묶음 전체를 한 번에 지나가고, 고른 탭에 대응하는
+ * `tabpanel` 이 있어야 한다. 여기서 하는 일은 목록을 거르는 것뿐이라 그 규약을 지킬 이유가 없고,
+ * 지키지 않으면서 이름만 빌리면 안 지켜지는 약속이 된다.
+ *
+ * 눌린 상태는 [aria-pressed] 로 말한다. 지금 동작(각각 Tab 으로 닿고, 눌러서 고름)과 정확히 맞는다.
+ */
+function CategoryFilter({
+  filter,
+  counts,
+  onChange,
+}: {
+  filter: Filter;
+  counts: Record<Filter, number>;
+  onChange: (filter: Filter) => void;
+}) {
+  return (
+    <div role="group" aria-label="모듈 종류" className="flex gap-1 rounded-(--radius-chip) bg-grey-100 p-1">
+      {FILTERS.map((option) => {
+        const selected = option.key === filter;
+        return (
+          <button
+            key={option.key}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => onChange(option.key)}
+            className={cn(
+              "flex-1 rounded-(--radius-chip) px-3 py-1.5 text-[13.5px] font-semibold transition-colors",
+              selected ? "bg-white text-grey-900 shadow-sm" : "text-grey-500 hover:text-grey-700",
+            )}
+          >
+            {option.label}
+            <span className="ml-1.5 text-[12px] font-medium text-grey-400 tabular-nums">
+              {counts[option.key]}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 function ModuleCard({
   module,
@@ -119,6 +172,7 @@ export default function ModuleStorePage() {
    * 응답이 뒤바뀌어 도착하면 순서가 튄다. 놓을 때 한 번만 저장한다.
    */
   const [dragOrder, setDragOrder] = useState<string[] | null>(null);
+  const [filter, setFilter] = useState<Filter>("ALL");
 
   if (isPending) return <PageSpinner />;
   if (isError) return <ErrorState onRetry={() => void refetch()} />;
@@ -127,11 +181,34 @@ export default function ModuleStorePage() {
     ? sortByIdOrder(modules ?? [], dragOrder, (module) => module.id)
     : (modules ?? []);
 
+  const shown = (module: ModuleSummary) => filter === "ALL" || module.category === filter;
+  const visible = ordered.filter(shown);
+
+  const counts: Record<Filter, number> = {
+    ALL: ordered.length,
+    TOOL: ordered.filter((module) => module.category === "TOOL").length,
+    GUIDE: ordered.filter((module) => module.category === "GUIDE").length,
+  };
+
+  /**
+   * 보이는 것끼리만 자리를 바꾸고, 전체 순서로 되돌려 놓는다.
+   *
+   * 가이드 탭에서 두 번째 가이드를 올리면 그 사이에 낀 도구는 제자리에 있어야 한다.
+   * 그래서 보이는 항목이 원래 차지하던 자리(slots)에 순서만 바꿔 다시 끼운다.
+   * 전체 탭이면 slots 가 곧 전체라 같은 코드가 그대로 동작한다.
+   */
   function reorderTo(from: number, to: number): string[] | null {
-    if (to < 0 || to >= ordered.length || from === to) return null;
+    if (to < 0 || to >= visible.length || from === to) return null;
+
+    const movedIds = visible.map((module) => module.id);
+    const [moved] = movedIds.splice(from, 1);
+    movedIds.splice(to, 0, moved);
+
+    const slots = ordered.flatMap((module, index) => (shown(module) ? [index] : []));
     const ids = ordered.map((module) => module.id);
-    const [moved] = ids.splice(from, 1);
-    ids.splice(to, 0, moved);
+    slots.forEach((slot, position) => {
+      ids[slot] = movedIds[position];
+    });
     return ids;
   }
 
@@ -159,7 +236,7 @@ export default function ModuleStorePage() {
     event.preventDefault();
     if (!draggingId) return;
 
-    const from = ordered.findIndex((item) => item.id === draggingId);
+    const from = visible.findIndex((item) => item.id === draggingId);
     if (from === -1 || from === index) return;
 
     const box = event.currentTarget.getBoundingClientRect();
@@ -191,6 +268,16 @@ export default function ModuleStorePage() {
         </p>
       </div>
 
+      <CategoryFilter filter={filter} counts={counts} onChange={setFilter} />
+
+      {/*
+        거르기가 먹혔다는 걸 눈으로 보지 못하는 사람에게 알린다. 목록 자체를 live 로 두면
+        카드 여덟 장을 통째로 다시 읽어 준다 — 바뀐 사실만 한 줄로 말한다.
+      */}
+      <p role="status" className="sr-only">
+        {FILTERS.find((option) => option.key === filter)?.label} 모듈 {visible.length}개
+      </p>
+
       {reorder.isError && (
         <p role="alert" className="text-[13px] text-danger">
           순서를 저장하지 못해 되돌렸어요. 잠시 후 다시 시도해 주세요.
@@ -198,12 +285,12 @@ export default function ModuleStorePage() {
       )}
 
       <div className="flex flex-col gap-4">
-        {ordered.map((module, index) => (
+        {visible.map((module, index) => (
           <ModuleCard
             key={module.id}
             module={module}
             position={index}
-            total={ordered.length}
+            total={visible.length}
             onMove={(delta) => moveBy(index, delta)}
             dragging={draggingId === module.id}
             onDragStart={(event) => startDrag(module.id, event)}
