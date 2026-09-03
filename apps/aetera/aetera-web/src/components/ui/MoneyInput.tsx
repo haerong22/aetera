@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { inKoreanUnits } from "@/lib/money";
 import { Input } from "./Input";
 
@@ -41,6 +42,33 @@ export function MoneyInput({
         className="text-right tabular-nums"
       />
       <p className="mt-1 h-4 text-[12px] text-grey-500">{units ?? hint ?? ""}</p>
+    </div>
+  );
+}
+
+/**
+ * 다른 데서 채워진 금액. [MoneyInput] 과 나란히 서야 하므로 **같은 파일에 둔다.**
+ *
+ * 치수를 각자 적어 두면 `Input` 의 높이가 바뀔 때 이쪽만 어긋나고, 그건 리뷰에서 안 보인다.
+ * 여기서는 `Input` 을 그대로 쓰고 읽기 전용으로만 만든다 — 높이를 아는 곳이 한 군데로 남는다.
+ */
+export function ReadOnlyMoney({
+  label,
+  value,
+  footer,
+}: {
+  label: string;
+  /** 이미 다듬어진 문자열. 아직 못 읽었으면 안내 문구를 그대로 넣는다. */
+  value: string;
+  /** 아래 한 줄. 출처·시점처럼 이 숫자가 어디서 왔는지 밝힌다. */
+  footer: ReactNode;
+}) {
+  return (
+    <div>
+      <Input label={label} readOnly value={value} className="bg-grey-50 text-right tabular-nums" />
+      <div className="mt-1 flex h-4 items-center justify-between gap-2 text-[12px] text-grey-500">
+        {footer}
+      </div>
     </div>
   );
 }

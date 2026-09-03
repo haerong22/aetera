@@ -12,7 +12,22 @@ export interface FrontendModule {
 
 export interface ModuleCapabilities {
   AddEventDialog?: ComponentType<CalendarDraftProps>;
-  MonthlyFixedCost?: ComponentType<MonthlyFixedCostProps>;
+  /** 한 달에 나가는 고정지출. */
+  MonthlyFixedCost?: ComponentType<AmountProviderProps>;
+  /** 당장 쓸 수 있는 현금. */
+  CashOnHand?: ComponentType<AmountProviderProps>;
+}
+
+/**
+ * 능력이 건네는 금액 한 덩어리.
+ *
+ * 금액만 주면 부르는 쪽이 그게 **언제 값인지** 알 수 없다. 자산처럼 달마다 찍는 기록은
+ * 석 달 전 잔액이 "지금 가진 돈" 자리에 조용히 앉을 수 있어, 어디서 온 값인지 함께 말한다.
+ */
+export interface ProvidedAmount {
+  amount: number;
+  /** 금액 아래에 함께 보일 한 줄. "2026년 9월 기준" 처럼 언제 값인지 밝힌다. */
+  note?: string;
 }
 
 /**
@@ -22,9 +37,9 @@ export interface ModuleCapabilities {
  * 훅을 조건부로 부를 수는 없으므로, 데이터를 읽는 훅은 제공하는 쪽 컴포넌트 안에 두고
  * 결과만 자식 함수로 넘긴다.
  */
-export interface MonthlyFixedCostProps {
-  /** 아직 못 읽었으면 `null`. 등록한 항목이 없으면 `0`. */
-  children: (monthlyTotal: number | null) => ReactNode;
+export interface AmountProviderProps {
+  /** 아직 못 읽었으면 `null`. */
+  children: (provided: ProvidedAmount | null) => ReactNode;
 }
 
 export interface CalendarDraft {

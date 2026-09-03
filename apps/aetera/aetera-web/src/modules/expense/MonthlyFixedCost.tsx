@@ -1,6 +1,6 @@
 "use client";
 
-import type { MonthlyFixedCostProps } from "../types";
+import type { AmountProviderProps } from "../types";
 import { useExpenses } from "./api";
 
 /**
@@ -11,8 +11,10 @@ import { useExpenses } from "./api";
  *
  * 합계를 여기서 다시 계산하지 않고 서버가 준 값을 그대로 넘긴다.
  * 연으로 합쳐 한 번만 나누는 규칙이 두 벌이 되면 화면마다 다른 숫자가 나온다.
+ *
+ * 언제 값인지는 밝히지 않는다 — 등록해 둔 금액이라 조회 시점이 곧 지금이다.
  */
-export function MonthlyFixedCost({ children }: MonthlyFixedCostProps) {
+export function MonthlyFixedCost({ children }: AmountProviderProps) {
   const { data } = useExpenses();
-  return <>{children(data?.monthlyTotal ?? null)}</>;
+  return <>{children(data ? { amount: data.monthlyTotal } : null)}</>;
 }
