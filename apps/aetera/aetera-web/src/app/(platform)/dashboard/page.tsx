@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useMyModules } from "@/modules/useMyModules";
 import { useScheduleEvents } from "@/modules/schedule/api";
@@ -12,22 +11,21 @@ import { ErrorState } from "@/components/ui/ErrorState";
 import { TodayHeader } from "@/components/dashboard/TodayHeader";
 import { AeteraBriefingCard } from "@/components/dashboard/AeteraBriefingCard";
 import { TodayScheduleCard } from "@/components/dashboard/TodayScheduleCard";
-import { PriorityCard } from "@/components/dashboard/PriorityCard";
-import { LifeOverviewCard } from "@/components/dashboard/LifeOverviewCard";
 import { WeeklyGoalsCard } from "@/components/dashboard/WeeklyGoalsCard";
-import { RecentTimelineCard } from "@/components/dashboard/RecentTimelineCard";
-import { MOCK_PRIORITIES } from "@/components/dashboard/mock";
 
 /**
  * 오늘 중심 Life Dashboard.
  *
- * DOM 순서 = 모바일(1열) 표시 순서: 헤더 → 브리핑 → 일정 → 우선순위 → 목표 → 라이프 → 기록.
- * 데스크톱(lg)에서는 12-column grid 로 재배치한다: 일정 6 + 우선순위 6 / 라이프 7 + 목표 5.
+ * **여기 있는 것은 전부 실제 데이터다.** 예전에는 우선순위·라이프 영역·최근 기록 카드가
+ * 지어낸 값을 보여 줬는데, 근거 없는 것을 확정된 분석처럼 내놓지 않기로 하고 걷어냈다.
+ * 뒤를 받칠 모듈이 생기면 그때 되살린다.
+ *
+ * DOM 순서 = 모바일(1열) 표시 순서: 헤더 → 브리핑 → 일정 → 목표.
+ * 데스크톱(lg)에서는 일정 7 + 목표 5 로 나눈다.
  */
 export default function DashboardPage() {
   const { user } = useAuth();
   const { data: modules, isPending: modulesPending, isError: modulesFailed, refetch } = useMyModules();
-  const [checkedPriorities, setCheckedPriorities] = useState(0);
 
   const scheduleEnabled = modules?.some((module) => module.id === SCHEDULE_MODULE_ID && module.enabled) ?? false;
   const goalEnabled = modules?.some((module) => module.id === GOAL_MODULE_ID && module.enabled) ?? false;
@@ -52,37 +50,26 @@ export default function DashboardPage() {
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
-      <div className="lg:order-1 lg:col-span-12">
+      <div className="lg:col-span-12">
         <TodayHeader
           nickname={user?.nickname}
           eventCount={events === null || eventsLoading || eventsFailed ? null : events.length}
-          priorityCount={MOCK_PRIORITIES.length - checkedPriorities}
         />
       </div>
 
-      <div className="lg:order-2 lg:col-span-12">
-        <AeteraBriefingCard events={events} />
-      </div>
+      {/* 요약할 일정이 없으면 그리지 않는다 — "모듈을 켜세요" 는 아래 카드가 이미 말한다. */}
+      {events !== null && (
+        <div className="lg:col-span-12">
+          <AeteraBriefingCard events={events} />
+        </div>
+      )}
 
-      <div className="lg:order-3 lg:col-span-6">
+      <div className="lg:col-span-7">
         <TodayScheduleCard events={events} isLoading={eventsLoading} isError={eventsFailed} />
       </div>
 
-      <div className="lg:order-4 lg:col-span-6">
-        <PriorityCard onCheckedCountChange={setCheckedPriorities} />
-      </div>
-
-      {/* 모바일에선 목표가 라이프보다 먼저, 데스크톱에선 라이프(7) + 목표(5) 순서 */}
-      <div className="lg:order-6 lg:col-span-5">
+      <div className="lg:col-span-5">
         <WeeklyGoalsCard enabled={goalEnabled} />
-      </div>
-
-      <div className="lg:order-5 lg:col-span-7">
-        <LifeOverviewCard />
-      </div>
-
-      <div className="lg:order-7 lg:col-span-12">
-        <RecentTimelineCard events={events} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Compass, History, Puzzle, Settings, Sparkles, Sun, type LucideIcon } from "lucide-react";
+import { Puzzle, Settings, Sun, type LucideIcon } from "lucide-react";
 import { sortByIdOrder } from "@/lib/order";
 import { frontendModules } from "@/modules/registry";
 import { modulePath } from "@/modules/types";
@@ -16,19 +16,9 @@ export interface NavEntry {
   moduleId?: string;
 }
 
-/** 모듈보다 위에 고정되는 코어 메뉴. */
-const NAV_TOP: NavEntry[] = [{ key: "today", label: "오늘", icon: Sun, href: "/dashboard" }];
-
-/** 아직 만들지 않은 기능의 자리. 순서를 바꿀 대상이 아니라 모듈 아래에 고정한다. */
-const NAV_PLANNED: NavEntry[] = [
-  { key: "timeline", label: "타임라인", icon: History },
-  { key: "coach", label: "AI 코치", icon: Sparkles },
-  { key: "life", label: "라이프", icon: Compass },
-];
-
-const NAV_BOTTOM: NavEntry[] = [
-  { key: "modules", label: "모듈", icon: Puzzle, href: "/settings/modules" },
-];
+/** 모듈 목록을 위아래에서 감싸는 코어 메뉴. */
+const TODAY: NavEntry = { key: "today", label: "오늘", icon: Sun, href: "/dashboard" };
+const MODULE_STORE: NavEntry = { key: "modules", label: "모듈", icon: Puzzle, href: "/settings/modules" };
 
 /**
  * 주요 메뉴. 모듈 메뉴는 레지스트리에서 만들어 넣는다 —
@@ -41,7 +31,7 @@ export function buildMainNav(orderedModuleIds: readonly string[]): NavEntry[] {
   const modules = sortByIdOrder(frontendModules, orderedModuleIds, (module) => module.id);
 
   return [
-    ...NAV_TOP,
+    TODAY,
     ...modules.map((module) => ({
       key: module.id,
       label: module.title,
@@ -49,8 +39,7 @@ export function buildMainNav(orderedModuleIds: readonly string[]): NavEntry[] {
       href: modulePath(module.id),
       moduleId: module.id,
     })),
-    ...NAV_PLANNED,
-    ...NAV_BOTTOM,
+    MODULE_STORE,
   ];
 }
 
