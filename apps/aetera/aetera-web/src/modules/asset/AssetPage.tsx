@@ -4,6 +4,8 @@ import { useState } from "react";
 import { PiggyBank, TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/StatusCard";
+import { SummaryCard } from "@/components/ui/SummaryCard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { cn } from "@/components/ui/cn";
@@ -99,45 +101,41 @@ export function AssetPage() {
       </div>
 
       {board.latestMonth === undefined ? (
-        <Card className="flex flex-col items-center gap-3 py-10 text-center">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-grey-100 text-grey-400">
-            <PiggyBank size={22} aria-hidden />
-          </span>
-          <p className="text-[15px] font-semibold text-grey-800">아직 기록이 없어요</p>
-          <p className="max-w-sm text-[13.5px] leading-relaxed text-grey-500">
-            통장 잔액, 전세보증금, 대출 잔액을 한 번 적어 두면 다음 달부터는 금액만 고치면 돼요.
-          </p>
-          <Button variant="secondary" onClick={() => setDialogOpen(true)}>
-            첫 기록 남기기
-          </Button>
-        </Card>
+        <EmptyState
+          icon={<PiggyBank size={22} aria-hidden />}
+          title="아직 기록이 없어요"
+          description="통장 잔액, 전세보증금, 대출 잔액을 한 번 적어 두면 다음 달부터는 금액만 고치면 돼요."
+          action={
+            <Button variant="secondary" onClick={() => setDialogOpen(true)}>
+              첫 기록 남기기
+            </Button>
+          }
+        />
       ) : (
         <>
-          <Card className="border-primary/20 bg-primary-light/40">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-              <div>
-                <p className="text-[13px] font-medium text-grey-600">순자산</p>
-                <p
-                  className={cn(
-                    "mt-0.5 text-[28px] leading-tight font-bold tabular-nums",
-                    board.netWorth < 0 ? "text-danger" : "text-primary",
-                  )}
-                >
-                  {won(board.netWorth)}
-                </p>
-              </div>
-              <div className="text-right text-[13px]">
-                <p className="font-medium text-grey-600">{formatMonth(board.latestMonth)} 기준</p>
-                <p className="mt-0.5 tabular-nums">
-                  {board.changeFromPrevious === undefined ? (
-                    <span className="text-grey-500">첫 기록이에요</span>
-                  ) : (
-                    <Change amount={board.changeFromPrevious} />
-                  )}
-                </p>
-              </div>
+          <SummaryCard>
+            <div>
+              <p className="text-[13px] font-medium text-grey-600">순자산</p>
+              <p
+                className={cn(
+                  "mt-0.5 text-[28px] leading-tight font-bold tabular-nums",
+                  board.netWorth < 0 ? "text-danger" : "text-primary",
+                )}
+              >
+                {won(board.netWorth)}
+              </p>
             </div>
-          </Card>
+            <div className="text-right text-[13px]">
+              <p className="font-medium text-grey-600">{formatMonth(board.latestMonth)} 기준</p>
+              <p className="mt-0.5 tabular-nums">
+                {board.changeFromPrevious === undefined ? (
+                  <span className="text-grey-500">첫 기록이에요</span>
+                ) : (
+                  <Change amount={board.changeFromPrevious} />
+                )}
+              </p>
+            </div>
+          </SummaryCard>
 
           {!recordedThisMonth && (
             <p className="rounded-(--radius-card) bg-warning-light px-4 py-3 text-[13.5px] leading-relaxed text-grey-700">

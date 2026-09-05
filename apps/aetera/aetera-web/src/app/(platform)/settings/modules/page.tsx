@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, type DragEvent } from "react";
-import { ChevronDown, ChevronUp, GripVertical, Puzzle } from "lucide-react";
+import { ChevronDown, ChevronUp, GripVertical, Puzzle, SearchX } from "lucide-react";
 import { useMyModules, useReorderModules, useToggleModule } from "@/modules/useMyModules";
 import { moduleById } from "@/modules/registry";
 import type { ModuleCategory, ModuleSummary } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/StatusCard";
 import { Switch } from "@/components/ui/Switch";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -284,21 +285,29 @@ export default function ModuleStorePage() {
         </p>
       )}
 
-      <div className="flex flex-col gap-4">
-        {visible.map((module, index) => (
-          <ModuleCard
-            key={module.id}
-            module={module}
-            position={index}
-            total={visible.length}
-            onMove={(delta) => moveBy(index, delta)}
-            dragging={draggingId === module.id}
-            onDragStart={(event) => startDrag(module.id, event)}
-            onDragOver={(event) => dragOverCard(index, event)}
-            onDragEnd={endDrag}
-          />
-        ))}
-      </div>
+      {visible.length === 0 ? (
+        <EmptyState
+          icon={<SearchX size={22} aria-hidden />}
+          title="이 종류의 모듈이 아직 없어요"
+          description="다른 종류를 골라 보세요. 새 모듈이 배포되면 여기에 바로 나타납니다."
+        />
+      ) : (
+        <div className="flex flex-col gap-4">
+          {visible.map((module, index) => (
+            <ModuleCard
+              key={module.id}
+              module={module}
+              position={index}
+              total={visible.length}
+              onMove={(delta) => moveBy(index, delta)}
+              dragging={draggingId === module.id}
+              onDragStart={(event) => startDrag(module.id, event)}
+              onDragOver={(event) => dragOverCard(index, event)}
+              onDragEnd={endDrag}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalendarPlus, Plus, RotateCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/StatusCard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { cn } from "@/components/ui/cn";
@@ -106,17 +107,11 @@ export function RenewalPage() {
       </div>
 
       {renewals.length === 0 ? (
-        <Card className="flex flex-col items-center gap-3 py-14 text-center">
-          <span className="flex size-14 items-center justify-center rounded-3xl bg-primary-light text-primary">
-            <ShieldCheck size={26} aria-hidden />
-          </span>
-          <div>
-            <p className="text-lg font-bold text-grey-900">아직 등록한 만기가 없어요</p>
-            <p className="mt-1 text-[14px] text-grey-500">
-              자동차보험, 실손보험, 전세계약, 여권처럼 놓치면 곤란한 것부터 넣어 보세요.
-            </p>
-          </div>
-        </Card>
+        <EmptyState
+          icon={<ShieldCheck size={22} aria-hidden />}
+          title="아직 등록한 만기가 없어요"
+          description="자동차보험, 실손보험, 전세계약, 여권처럼 놓치면 곤란한 것부터 넣어 보세요."
+        />
       ) : (
         <Card className="p-0 sm:p-0">
           <ul className="divide-y divide-grey-100 px-5 sm:px-6">

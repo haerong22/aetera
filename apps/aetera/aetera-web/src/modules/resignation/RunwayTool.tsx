@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/Card";
+import { SummaryCard } from "@/components/ui/SummaryCard";
 import { MoneyInput, ReadOnlyMoney } from "@/components/ui/MoneyInput";
 import { localToday } from "@/lib/date";
 import { won } from "@/lib/money";
@@ -34,7 +34,7 @@ function Result({ cash, monthlyBurn }: { cash: number; monthlyBurn: number }) {
   const months = cash / monthlyBurn;
 
   return (
-    <Card className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-primary/20 bg-primary-light/40">
+    <SummaryCard className="mt-4">
       <div>
         <p className="text-[13px] font-medium text-grey-600">지금 가진 돈으로</p>
         <p className="mt-0.5 text-[28px] leading-tight font-bold text-primary tabular-nums">
@@ -45,7 +45,7 @@ function Result({ cash, monthlyBurn }: { cash: number; monthlyBurn: number }) {
         <p className="text-[13px] font-medium text-grey-600">{formatRunsOut(months)}쯤 바닥</p>
         <p className="mt-0.5 text-[13px] text-grey-600 tabular-nums">한 달 {won(monthlyBurn)}</p>
       </div>
-    </Card>
+    </SummaryCard>
   );
 }
 

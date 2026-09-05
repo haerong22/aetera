@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Plus, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/StatusCard";
+import { SummaryCard } from "@/components/ui/SummaryCard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { won } from "@/lib/money";
@@ -91,7 +93,7 @@ export function ExpensePage() {
         </Button>
       </div>
 
-      <Card className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-primary/20 bg-primary-light/40">
+      <SummaryCard>
         <div>
           <p className="text-[13px] font-medium text-grey-600">한 달에</p>
           <p className="mt-0.5 text-[28px] leading-tight font-bold text-primary tabular-nums">
@@ -102,21 +104,19 @@ export function ExpensePage() {
           <p className="text-[13px] font-medium text-grey-600">1년이면</p>
           <p className="mt-0.5 text-[17px] font-bold text-grey-800 tabular-nums">{won(board.yearlyTotal)}</p>
         </div>
-      </Card>
+      </SummaryCard>
 
       {board.items.length === 0 ? (
-        <Card className="flex flex-col items-center gap-3 py-10 text-center">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-grey-100 text-grey-400">
-            <Wallet size={22} aria-hidden />
-          </span>
-          <p className="text-[15px] font-semibold text-grey-800">아직 등록한 고정지출이 없어요</p>
-          <p className="max-w-sm text-[13.5px] leading-relaxed text-grey-500">
-            월세, 통신비, 보험료, 구독료처럼 매달 같은 날 빠져나가는 것부터 넣어 보세요.
-          </p>
-          <Button variant="secondary" onClick={openNew}>
-            첫 항목 추가하기
-          </Button>
-        </Card>
+        <EmptyState
+          icon={<Wallet size={22} aria-hidden />}
+          title="아직 등록한 고정지출이 없어요"
+          description="월세, 통신비, 보험료, 구독료처럼 매달 같은 날 빠져나가는 것부터 넣어 보세요."
+          action={
+            <Button variant="secondary" onClick={openNew}>
+              첫 항목 추가하기
+            </Button>
+          }
+        />
       ) : (
         <Card className="p-0 sm:p-0">
           <ul className="divide-y divide-grey-100 px-5 sm:px-6">

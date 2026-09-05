@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Target } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/StatusCard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { ModuleDisabledNotice, isModuleDisabled } from "../ModuleDisabledNotice";
@@ -45,17 +46,11 @@ export function GoalPage() {
       </div>
 
       {goals.length === 0 ? (
-        <Card className="flex flex-col items-center gap-3 py-14 text-center">
-          <span className="flex size-14 items-center justify-center rounded-3xl bg-primary-light text-primary">
-            <Target size={26} aria-hidden />
-          </span>
-          <div>
-            <p className="text-lg font-bold text-grey-900">아직 정한 목표가 없어요</p>
-            <p className="mt-1 text-[14px] text-grey-500">
-              &quot;주 3회 운동&quot;처럼 작게 시작하면 지키기 쉬워요.
-            </p>
-          </div>
-        </Card>
+        <EmptyState
+          icon={<Target size={22} aria-hidden />}
+          title="아직 정한 목표가 없어요"
+          description={'"주 3회 운동"처럼 작게 시작하면 지키기 쉬워요.'}
+        />
       ) : (
         PERIOD_ORDER.map((period) => {
           const inPeriod = goals.filter((goal) => goal.period === period);
