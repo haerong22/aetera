@@ -22,7 +22,7 @@ class FixedExpenseRepositoryJpaAdapter(
     override fun getById(id: FixedExpenseId): FixedExpense? = fixedExpenseJpaRepository.findByIdOrNull(id.value)?.toModel()
 
     override fun findAllByUserId(userId: UserId): List<FixedExpense> = fixedExpenseJpaRepository
-        .findAllByUserIdOrderByCreatedAtAsc(userId.value)
+        .findAllByUserId(userId.value)
         .map { it.toModel() }
 
     override fun delete(expense: FixedExpense) {
