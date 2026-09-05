@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useMyModules } from "@/modules/useMyModules";
-import { FOOTER_NAV, buildMainNav, isNavActive } from "@/components/layout/nav";
+import { buildMainNav, isNavActive } from "@/components/layout/nav";
 import { SidebarNavItem } from "@/components/layout/SidebarNavItem";
 import { PageSpinner } from "@/components/ui/Spinner";
 
@@ -50,14 +50,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="mt-auto flex flex-col gap-0.5 border-t border-grey-100 pt-3">
-        {FOOTER_NAV.map((entry) => (
-          <SidebarNavItem
-            key={entry.key}
-            entry={entry}
-            active={isNavActive(entry, pathname)}
-            onNavigate={onNavigate}
-          />
-        ))}
         <div className="flex items-center justify-between px-4 pt-3">
           <div className="min-w-0">
             <p className="truncate text-[14px] font-semibold text-grey-800">{user?.nickname}</p>

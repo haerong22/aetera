@@ -1,4 +1,4 @@
-import { Puzzle, Settings, Sun, type LucideIcon } from "lucide-react";
+import { Puzzle, Sun, type LucideIcon } from "lucide-react";
 import { sortByIdOrder } from "@/lib/order";
 import { frontendModules } from "@/modules/registry";
 import { modulePath } from "@/modules/types";
@@ -7,8 +7,7 @@ export interface NavEntry {
   key: string;
   label: string;
   icon: LucideIcon;
-  /** 없으면 아직 연결된 페이지가 없는 메뉴 — 비활성으로 표시하고 클릭을 막는다. */
-  href?: string;
+  href: string;
   /**
    * 모듈이 뒤를 받치는 메뉴. 사용자가 그 모듈을 켰을 때만 보인다 —
    * 무엇이 보일지는 언제나 서버(`GET /api/v1/me/modules`)가 정한다.
@@ -43,10 +42,6 @@ export function buildMainNav(orderedModuleIds: readonly string[]): NavEntry[] {
   ];
 }
 
-/** 하단 고정 메뉴. */
-export const FOOTER_NAV: NavEntry[] = [{ key: "settings", label: "설정", icon: Settings }];
-
 export function isNavActive(entry: NavEntry, pathname: string): boolean {
-  if (!entry.href) return false;
   return entry.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(entry.href);
 }
