@@ -21,7 +21,6 @@ private object ResignationLinks {
     val NHIS = GuideLink("국민건강보험공단", "https://www.nhis.or.kr")
     val NPS = GuideLink("국민연금공단", "https://www.nps.or.kr")
     val MOEL = GuideLink("고용노동부", "https://www.moel.go.kr")
-    val FOUR_INSURE = GuideLink("4대사회보험 정보연계센터", "https://www.4insure.or.kr")
 }
 
 internal val RESIGNATION_GUIDE: GuideTemplate =
@@ -190,7 +189,7 @@ internal val RESIGNATION_GUIDE: GuideTemplate =
                                     "회사가 신고하는 절차지만, 늦어지면 건강보험 전환과 실업급여 신청이 함께 밀려요. " +
                                         "직접 조회해서 처리 여부를 확인하세요.",
                                 dueOffsetDays = 7,
-                                link = ResignationLinks.FOUR_INSURE,
+                                link = SharedLinks.FOUR_INSURE,
                             ),
                             task(
                                 key = "employment-cert",

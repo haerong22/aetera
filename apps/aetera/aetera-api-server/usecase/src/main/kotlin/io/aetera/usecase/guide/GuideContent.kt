@@ -12,6 +12,7 @@ import io.aetera.model.guide.GuideTaskKey
  */
 internal object SharedLinks {
     val HOMETAX = GuideLink("국세청 홈택스", "https://www.hometax.go.kr")
+    val FOUR_INSURE = GuideLink("4대사회보험 정보연계센터", "https://www.4insure.or.kr")
 }
 
 internal fun task(

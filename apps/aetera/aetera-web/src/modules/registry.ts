@@ -2,6 +2,7 @@ import type { FrontendModule } from "./types";
 import { scheduleModule } from "./schedule";
 import { resignationModule } from "./resignation";
 import { movingModule } from "./moving";
+import { jobChangeModule } from "./job-change";
 import { yearEndTaxModule } from "./year-end-tax";
 import { renewalModule } from "./renewal";
 import { goalModule } from "./goal";
@@ -19,6 +20,7 @@ export const frontendModules: FrontendModule[] = [
   scheduleModule,
   resignationModule,
   movingModule,
+  jobChangeModule,
   yearEndTaxModule,
   renewalModule,
   goalModule,
