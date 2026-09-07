@@ -2,8 +2,8 @@
 
 import { useState, type DragEvent } from "react";
 import { ChevronDown, ChevronUp, GripVertical, Puzzle } from "lucide-react";
-import Link from "next/link";
 import { Card } from "@/components/ui/Card";
+import { LinkButton } from "@/components/ui/LinkButton";
 import { EmptyState } from "@/components/ui/StatusCard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -190,12 +190,7 @@ export default function SettingsPage() {
             title="아직 켠 모듈이 없어요"
             description="모듈 스토어에서 필요한 것을 켜면 여기서 순서를 정할 수 있어요."
             action={
-<Link
-                href="/settings/modules"
-                className="rounded-(--radius-button) bg-primary px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-primary-hover"
-              >
-                모듈 스토어로 가기
-              </Link>
+<LinkButton href="/settings/modules">모듈 스토어로 가기</LinkButton>
             }
           />
         ) : (

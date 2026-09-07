@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Puzzle } from "lucide-react";
+import { LinkButton } from "@/components/ui/LinkButton";
 import { StatusCard } from "@/components/ui/StatusCard";
 import { ApiError } from "@/lib/api-client";
 
@@ -24,12 +24,7 @@ export function ModuleDisabledNotice({ title }: { title: string }) {
       title={`${title} 모듈을 아직 사용하고 있지 않아요`}
       description="모듈 스토어에서 켜면 바로 쓸 수 있어요."
       action={
-        <Link
-          href="/settings/modules"
-          className="rounded-(--radius-button) bg-primary px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-primary-hover"
-        >
-          모듈 스토어로 가기
-        </Link>
+        <LinkButton href="/settings/modules">모듈 스토어로 가기</LinkButton>
       }
     />
   );
