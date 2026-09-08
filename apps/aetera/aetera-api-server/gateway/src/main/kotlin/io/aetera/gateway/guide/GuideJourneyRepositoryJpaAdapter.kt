@@ -18,6 +18,9 @@ class GuideJourneyRepositoryJpaAdapter(
             create = { GuideJourneyJpaEntity.from(journey) },
         ).toModel()
 
+    override fun findAllByUserId(userId: UserId): List<GuideJourney> =
+        guideJourneyJpaRepository.findAllByUserId(userId.value).map { it.toModel() }
+
     override fun getByUserIdAndGuideId(
         userId: UserId,
         guideId: GuideId,

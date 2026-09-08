@@ -25,10 +25,17 @@ class GuideCatalog(
                 check(duplicated.isEmpty()) { "가이드 아이디가 겹칩니다: $duplicated" }
             }.associate { it.template.id to it.template }
 
+    /** 배포된 가이드 전부. 타임라인처럼 "어느 가이드가 있나"를 물어보는 쪽이 쓴다. */
+    val guideIds: Set<GuideId> get() = byId.keys
+
+    /** 없으면 null. 콘텐츠에서 사라진 가이드의 낡은 행을 마주치는 쪽이 쓴다. */
+    fun findOrNull(id: GuideId): GuideTemplate? = byId[id]
+
     /**
      * 모듈 가드가 이미 "배포됐고 사용자가 켠 모듈"임을 보장한 뒤에 불린다.
      * 그래도 여기서 한 번 더 막는 이유: 가이드가 아닌 모듈(일정)의 아이디로 이 API 를 부르면
      * 403 이 아니라 404 여야 하기 때문이다.
      */
-    fun getOrThrow(id: GuideId): GuideTemplate = byId[id] ?: throw CoreException(GuideErrorCode.GUIDE_NOT_FOUND, "존재하지 않는 가이드입니다. id=$id")
+    fun getOrThrow(id: GuideId): GuideTemplate =
+        findOrNull(id) ?: throw CoreException(GuideErrorCode.GUIDE_NOT_FOUND, "존재하지 않는 가이드입니다. id=$id")
 }
