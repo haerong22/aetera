@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Puzzle, SearchX } from "lucide-react";
+import { SearchX } from "lucide-react";
 import { useMyModules, useToggleModule } from "@/modules/useMyModules";
-import { moduleById } from "@/modules/registry";
+import { moduleIcon } from "@/modules/registry";
 import type { ModuleCategory, ModuleSummary } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -69,8 +69,7 @@ function CategoryFilter({
 
 function ModuleCard({ module }: { module: ModuleSummary }) {
   const toggle = useToggleModule();
-  const definition = moduleById.get(module.id);
-  const Icon = definition?.icon ?? Puzzle;
+  const Icon = moduleIcon(module.id);
 
   return (
     <Card className="flex items-start gap-3">

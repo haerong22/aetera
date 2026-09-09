@@ -9,7 +9,7 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { cn } from "@/components/ui/cn";
 import { sortByIdOrder } from "@/lib/order";
-import { moduleById } from "@/modules/registry";
+import { moduleIcon } from "@/modules/registry";
 import { useMyModules, useReorderModules } from "@/modules/useMyModules";
 import type { ModuleSummary } from "@/lib/types";
 
@@ -32,7 +32,7 @@ function OrderRow({
   onDragOver: (event: DragEvent<HTMLElement>) => void;
   onDragEnd: () => void;
 }) {
-  const Icon = moduleById.get(module.id)?.icon ?? Puzzle;
+  const Icon = moduleIcon(module.id);
 
   return (
     <li
