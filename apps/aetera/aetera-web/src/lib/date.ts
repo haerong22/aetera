@@ -14,6 +14,18 @@ export function localToday(): Date {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
+const MILLIS_PER_DAY = 86_400_000;
+
+/**
+ * 오늘로부터 며칠 뒤인지. 지난 날이면 음수.
+ *
+ * 두 날짜 모두 자정이라 나눗셈이 떨어지지만, 서머타임을 쓰는 지역에서는 하루가 23시간일 수
+ * 있어 반올림한다. 한국은 해당 없지만 여기서 굳이 전제할 이유도 없다.
+ */
+export function daysUntil(iso: string): number {
+  return Math.round((fromLocalDateIso(iso).getTime() - localToday().getTime()) / MILLIS_PER_DAY);
+}
+
 export function isoFromToday(days: number): string {
   const date = localToday();
   date.setDate(date.getDate() + days);

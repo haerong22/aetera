@@ -1,4 +1,4 @@
-import { fromLocalDateIso, localToday } from "@/lib/date";
+import { daysUntil } from "@/lib/date";
 import type { Renewal, RenewalCategory, RenewalCycle } from "./api";
 
 export const CATEGORY_LABELS: Record<RenewalCategory, string> = {
@@ -21,14 +21,6 @@ export const CYCLE_LABELS: Record<RenewalCycle, string> = {
   TEN_YEARS: "10년",
 };
 
-const MILLIS_PER_DAY = 86_400_000;
-
-function daysUntilExpiry(renewal: Renewal): number {
-  return Math.round(
-    (fromLocalDateIso(renewal.expiresAt).getTime() - localToday().getTime()) / MILLIS_PER_DAY,
-  );
-}
-
 type RenewalStatus = "expired" | "due" | "fine";
 
 /**
@@ -36,13 +28,13 @@ type RenewalStatus = "expired" | "due" | "fine";
  * "언제부터 급한가"는 항목마다 다르므로 noticeDays 를 쓴다(여권은 6개월 전, 보험은 한 달 전).
  */
 export function renewalStatus(renewal: Renewal): RenewalStatus {
-  const days = daysUntilExpiry(renewal);
+  const days = daysUntil(renewal.expiresAt);
   if (days < 0) return "expired";
   return days <= renewal.noticeDays ? "due" : "fine";
 }
 
 export function formatExpiry(renewal: Renewal): string {
-  const days = daysUntilExpiry(renewal);
+  const days = daysUntil(renewal.expiresAt);
   if (days === 0) return "오늘 만기";
   if (days < 0) return `${-days}일 지남`;
   return `${days}일 남음`;
