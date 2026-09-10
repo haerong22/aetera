@@ -15,6 +15,18 @@ export function useMyModules() {
   });
 }
 
+/**
+ * 그 모듈을 켰는지. 같은 쿼리를 공유하므로 여러 번 불러도 요청은 한 번이다.
+ *
+ * **목록을 아직 못 받은 동안은 `false`.** 로딩을 스스로 그리는 화면(대시보드는 스피너로
+ * 빠진다)에는 맞지만, 기다리는 동안 있던 것을 그대로 두어야 하는 곳에는 맞지 않는다 —
+ * 사이드바가 이 훅을 쓰면 새로고침할 때마다 메뉴가 한 번 깜빡인다.
+ */
+export function useModuleEnabled(moduleId: string): boolean {
+  const { data: modules } = useMyModules();
+  return modules?.some((module) => module.id === moduleId && module.enabled) ?? false;
+}
+
 export function useToggleModule() {
   const queryClient = useQueryClient();
   return useMutation({

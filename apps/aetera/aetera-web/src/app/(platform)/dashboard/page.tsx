@@ -1,10 +1,11 @@
 "use client";
 
 import { useAuth } from "@/lib/auth";
-import { useMyModules } from "@/modules/useMyModules";
+import { useModuleEnabled, useMyModules } from "@/modules/useMyModules";
 import { useScheduleEvents } from "@/modules/schedule/api";
 import { SCHEDULE_MODULE_ID } from "@/modules/schedule/id";
 import { GOAL_MODULE_ID } from "@/modules/goal/id";
+import { TIMELINE_MODULE_ID } from "@/modules/timeline/id";
 import { endOfDay, startOfDay } from "@/modules/schedule/calendar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -12,23 +13,26 @@ import { TodayHeader } from "@/components/dashboard/TodayHeader";
 import { AeteraBriefingCard } from "@/components/dashboard/AeteraBriefingCard";
 import { TodayScheduleCard } from "@/components/dashboard/TodayScheduleCard";
 import { WeeklyGoalsCard } from "@/components/dashboard/WeeklyGoalsCard";
+import { UpcomingTimelineCard } from "@/components/dashboard/UpcomingTimelineCard";
 
 /**
  * 오늘 중심 Life Dashboard.
  *
  * **여기 있는 것은 전부 실제 데이터다.** 예전에는 우선순위·라이프 영역·최근 기록 카드가
  * 지어낸 값을 보여 줬는데, 근거 없는 것을 확정된 분석처럼 내놓지 않기로 하고 걷어냈다.
- * 뒤를 받칠 모듈이 생기면 그때 되살린다.
+ * 비워 둔 자리 하나는 타임라인이 생기면서 실제 데이터로 채웠다.
  *
- * DOM 순서 = 모바일(1열) 표시 순서: 헤더 → 브리핑 → 일정 → 목표.
- * 데스크톱(lg)에서는 일정 7 + 목표 5 로 나눈다.
+ * DOM 순서 = 모바일(1열) 표시 순서: 헤더 → 브리핑 → 일정 → 목표 → 다가오는 일.
+ * 데스크톱(lg)에서는 일정 7 + 목표 5, 다가오는 일은 아래 한 줄을 다 쓴다.
  */
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { data: modules, isPending: modulesPending, isError: modulesFailed, refetch } = useMyModules();
+  // 목록 자체는 안 쓰고 로딩·실패만 본다. 어느 모듈을 켰는지는 useModuleEnabled 가 답한다.
+  const { isPending: modulesPending, isError: modulesFailed, refetch } = useMyModules();
 
-  const scheduleEnabled = modules?.some((module) => module.id === SCHEDULE_MODULE_ID && module.enabled) ?? false;
-  const goalEnabled = modules?.some((module) => module.id === GOAL_MODULE_ID && module.enabled) ?? false;
+  const scheduleEnabled = useModuleEnabled(SCHEDULE_MODULE_ID);
+  const goalEnabled = useModuleEnabled(GOAL_MODULE_ID);
+  const timelineEnabled = useModuleEnabled(TIMELINE_MODULE_ID);
 
   // 하루 경계 시각이라 렌더마다 같은 ISO 문자열이 나온다. 쿼리 키가 문자열이므로 메모가 필요 없다.
   const now = new Date();
@@ -70,6 +74,10 @@ export default function DashboardPage() {
 
       <div className="lg:col-span-5">
         <WeeklyGoalsCard enabled={goalEnabled} />
+      </div>
+
+      <div className="lg:col-span-12">
+        <UpcomingTimelineCard enabled={timelineEnabled} />
       </div>
     </div>
   );
