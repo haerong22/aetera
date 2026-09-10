@@ -13,12 +13,7 @@ import { localToday, toLocalDateIso } from "@/lib/date";
 import { moduleIcon } from "../registry";
 import { ModuleDisabledNotice, isModuleDisabled } from "../ModuleDisabledNotice";
 import { useTimeline, type TimelineEntry } from "./api";
-
-/** `"2026-09-30"` → `"9월 30일"`. 연도는 왼쪽 제목이 이미 말한다. */
-function formatDay(iso: string): string {
-  const [, month, day] = iso.split("-").map(Number);
-  return `${month}월 ${day}일`;
-}
+import { formatDay } from "./format";
 
 function EntryRow({ entry, today }: { entry: TimelineEntry; today: string }) {
   const Icon = moduleIcon(entry.moduleId);
@@ -44,7 +39,7 @@ function EntryRow({ entry, today }: { entry: TimelineEntry; today: string }) {
           {formatDay(entry.on)}
         </span>
         <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">
-          <Icon size={13} />
+          <Icon size={13} aria-hidden />
         </span>
         <span className="min-w-0">
           <span className="block text-[14.5px] font-semibold text-grey-900">{entry.title}</span>

@@ -17,11 +17,12 @@ export interface TimelineEntry {
  * 해를 넘길 때마다 queryKey 가 바뀌므로 [keepPreviousData] 를 건다. 없으면 새 해를 받아오는
  * 동안 `data` 가 비어 **연도 버튼까지 사라진다** — 방금 누른 버튼이 손 밑에서 없어지는 셈이다.
  */
-export function useTimeline(from: string, to: string) {
+export function useTimeline(from: string, to: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["timeline", "entries", from, to] as const,
     queryFn: () =>
       apiFetch<TimelineEntry[]>(`/api/v1/modules/timeline/entries?from=${from}&to=${to}`),
     placeholderData: keepPreviousData,
+    enabled: options?.enabled ?? true,
   });
 }
