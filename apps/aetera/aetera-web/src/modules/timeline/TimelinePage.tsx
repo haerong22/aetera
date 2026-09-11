@@ -15,7 +15,7 @@ import { ModuleDisabledNotice, isModuleDisabled } from "../ModuleDisabledNotice"
 import { useTimeline, type TimelineEntry } from "./api";
 import { formatDay } from "./format";
 
-function EntryRow({ entry, today }: { entry: TimelineEntry; today: string }) {
+function EntryRow({ entry, today, last }: { entry: TimelineEntry; today: string; last: boolean }) {
   const Icon = moduleIcon(entry.moduleId);
   const future = entry.on > today;
 
@@ -31,10 +31,11 @@ function EntryRow({ entry, today }: { entry: TimelineEntry; today: string }) {
               : "mt-1.5 size-2.5 shrink-0 rounded-full bg-primary/60"
           }
         />
-        <span aria-hidden className="w-px flex-1 bg-grey-200" />
+        {/* 축은 점과 점을 잇는 것이라 마지막 점 아래로는 그리지 않는다 — 없는 줄을 가리키게 된다. */}
+        {!last && <span aria-hidden className="w-px flex-1 bg-grey-200" />}
       </div>
 
-      <div className="flex min-w-0 flex-1 items-baseline gap-3 pb-5">
+      <div className={cn("flex min-w-0 flex-1 items-baseline gap-3", !last && "pb-5")}>
         <span className="w-20 shrink-0 text-[13px] font-medium text-grey-500 tabular-nums">
           {formatDay(entry.on)}
         </span>
@@ -79,16 +80,24 @@ export function TimelinePage() {
           {year - 1}년
         </Button>
         <span className="text-[17px] font-bold text-grey-900 tabular-nums">{year}년</span>
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={year >= today.getFullYear() + 1}
-          onClick={() => setYear(year + 1)}
-        >
+        {/*
+          앞쪽에 한계를 두지 않는다. 내년까지만 열어 두면 5년짜리 만기나 멀리 잡은 계약이
+          목록에 있어도 영영 닿을 수 없다. 지난 쪽도 열려 있으니 양쪽이 같은 규칙이고,
+          기록 없는 해는 비었다고 말해 주므로 헤맬 일도 없다.
+        */}
+        <Button size="sm" variant="ghost" onClick={() => setYear(year + 1)}>
           {year + 1}년
           <ChevronRight size={16} aria-hidden />
         </Button>
       </div>
+
+      {/*
+        해를 넘긴 걸 눈으로 보지 못하는 사람에게 알린다. 목록 자체를 live 로 두면
+        줄을 통째로 다시 읽어 준다 — 바뀐 사실만 한 줄로 말한다.
+      */}
+      <p role="status" className="sr-only">
+        {year}년 {isPlaceholderData ? "불러오는 중" : `기록 ${entries.length}개`}
+      </p>
 
       {/* 지난 해를 받아오는 동안에는 이전 해의 줄이 남아 있다 — 흐리게 해서 아직 도착 전임을 알린다. */}
       <div className={cn("transition-opacity", isPlaceholderData && "opacity-50")}>
@@ -103,7 +112,12 @@ export function TimelinePage() {
           <Card>
             <ol className="flex flex-col">
               {entries.map((entry, index) => (
-                <EntryRow key={`${entry.moduleId}-${entry.on}-${index}`} entry={entry} today={todayIso} />
+                <EntryRow
+                  key={`${entry.moduleId}-${entry.on}-${index}`}
+                  entry={entry}
+                  today={todayIso}
+                  last={index === entries.length - 1}
+                />
               ))}
             </ol>
           </Card>
