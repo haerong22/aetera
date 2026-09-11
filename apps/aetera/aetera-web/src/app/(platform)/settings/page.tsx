@@ -41,7 +41,7 @@ function OrderRow({
       // 순서를 확정하는 건 항상 dragend 다 — 허공에 놓아도 반드시 불린다.
       onDrop={(event) => event.preventDefault()}
       onDragEnd={onDragEnd}
-      className={cn("flex items-center gap-3 py-2", dragging && "opacity-50")}
+      className={cn("flex items-center gap-3 py-3", dragging && "opacity-50")}
     >
       <div className="flex shrink-0 flex-col items-center gap-0.5">
         <button
@@ -195,7 +195,7 @@ export default function SettingsPage() {
           />
         ) : (
           <Card className="p-0 sm:p-0">
-            <ul className="divide-y divide-grey-100 px-5 py-2 sm:px-6">
+            <ul className="divide-y divide-grey-100 px-5 sm:px-6">
               {ordered.map((module, index) => (
                 <OrderRow
                   key={module.id}
