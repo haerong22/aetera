@@ -7,6 +7,7 @@ import io.aetera.model.renewal.RenewalRepository
 import io.aetera.model.user.UserId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 
 @Repository
 class RenewalRepositoryJpaAdapter(
@@ -23,6 +24,14 @@ class RenewalRepositoryJpaAdapter(
 
     override fun findAllByUserId(userId: UserId): List<Renewal> = renewalJpaRepository
         .findAllByUserId(userId.value)
+        .map { it.toModel() }
+
+    override fun findAllByUserIdAndExpiresAtBetween(
+        userId: UserId,
+        from: LocalDate,
+        to: LocalDate,
+    ): List<Renewal> = renewalJpaRepository
+        .findAllByUserIdAndExpiresAtBetween(userId.value, from, to)
         .map { it.toModel() }
 
     override fun delete(renewal: Renewal) {

@@ -7,6 +7,12 @@ import java.util.UUID
 interface AssetEntryJpaRepository : JpaRepository<AssetEntryJpaEntity, UUID> {
     fun findAllByUserIdOrderByMonthDesc(userId: UUID): List<AssetEntryJpaEntity>
 
+    fun findAllByUserIdAndMonthBetweenOrderByMonthDesc(
+        userId: UUID,
+        from: LocalDate,
+        to: LocalDate,
+    ): List<AssetEntryJpaEntity>
+
     fun deleteByUserIdAndMonth(
         userId: UUID,
         month: LocalDate,

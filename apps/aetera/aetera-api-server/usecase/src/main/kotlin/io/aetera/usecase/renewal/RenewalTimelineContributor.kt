@@ -26,7 +26,6 @@ class RenewalTimelineContributor(
         from: LocalDate,
         to: LocalDate,
     ): List<TimelineEntry> = renewalRepository
-        .findAllByUserId(userId)
-        .filter { it.expiresAt in from..to }
+        .findAllByUserIdAndExpiresAtBetween(userId, from, to)
         .map { TimelineEntry(moduleId = RenewalModule.MODULE_ID, on = it.expiresAt, title = "${it.title} 만기") }
 }

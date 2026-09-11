@@ -31,6 +31,8 @@ class GuideTimelineContributor(
         to: LocalDate,
     ): List<TimelineEntry> = guideJourneyRepository
         .findAllByUserId(userId)
+        // 자산·만기와 달리 기간을 쿼리로 내리지 않는다. 여정은 가이드마다 최대 하나라
+        // 한 사람의 행이 배포된 가이드 수(지금 넷)를 넘지 않고, anchor_date 에 인덱스도 없다.
         .filter { it.anchorDate in from..to }
         .mapNotNull { journey ->
             // 콘텐츠에서 사라진 가이드의 낡은 여정이 남아 있을 수 있다.

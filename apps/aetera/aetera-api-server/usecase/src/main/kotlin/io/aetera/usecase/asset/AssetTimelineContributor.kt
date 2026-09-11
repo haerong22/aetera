@@ -27,9 +27,8 @@ class AssetTimelineContributor(
         from: LocalDate,
         to: LocalDate,
     ): List<TimelineEntry> = assetEntryRepository
-        .findAllByUserId(userId)
+        .findAllByUserIdAndMonthBetween(userId, from, to)
         .groupBy { it.month }
-        .filterKeys { it in from..to }
         .map { (month, entries) ->
             TimelineEntry(
                 moduleId = AssetModule.MODULE_ID,

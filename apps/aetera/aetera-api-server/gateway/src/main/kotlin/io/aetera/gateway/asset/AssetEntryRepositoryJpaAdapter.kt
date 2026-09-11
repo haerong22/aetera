@@ -22,6 +22,14 @@ class AssetEntryRepositoryJpaAdapter(
         .findAllByUserIdOrderByMonthDesc(userId.value)
         .map { it.toModel() }
 
+    override fun findAllByUserIdAndMonthBetween(
+        userId: UserId,
+        from: LocalDate,
+        to: LocalDate,
+    ): List<AssetEntry> = assetEntryJpaRepository
+        .findAllByUserIdAndMonthBetweenOrderByMonthDesc(userId.value, from, to)
+        .map { it.toModel() }
+
     override fun deleteByUserIdAndMonth(
         userId: UserId,
         month: LocalDate,
