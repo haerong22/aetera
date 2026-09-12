@@ -16,6 +16,8 @@ export interface ModuleCapabilities {
   MonthlyFixedCost?: ComponentType<AmountProviderProps>;
   /** 당장 쓸 수 있는 현금. */
   CashOnHand?: ComponentType<AmountProviderProps>;
+  /** 일을 그만둬도 이어지는 한 달 소득. 전체 소득이 아니다 — 월급은 빠져 있다. */
+  ContinuingIncome?: ComponentType<AmountProviderProps>;
 }
 
 /**

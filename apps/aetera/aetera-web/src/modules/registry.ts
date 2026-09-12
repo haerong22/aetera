@@ -9,6 +9,7 @@ import { renewalModule } from "./renewal";
 import { goalModule } from "./goal";
 import { expenseModule } from "./expense";
 import { assetModule } from "./asset";
+import { incomeModule } from "./income";
 import { timelineModule } from "./timeline";
 
 /**
@@ -28,6 +29,7 @@ export const frontendModules: FrontendModule[] = [
   goalModule,
   expenseModule,
   assetModule,
+  incomeModule,
   timelineModule,
 ];
 
