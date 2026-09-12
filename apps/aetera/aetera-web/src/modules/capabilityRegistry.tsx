@@ -42,13 +42,17 @@ export function useCashOnHand(): Capability<"CashOnHand"> {
   return useCapability("CashOnHand");
 }
 
+export function useContinuingIncome(): Capability<"ContinuingIncome"> {
+  return useCapability("ContinuingIncome");
+}
+
 /**
  * 능력이 있으면 그 값을, 없으면 `null` 을 준 채로 자식을 그린다.
  *
  * 금액을 둘 이상 받는 화면이 "있음/없음"을 손으로 엮으면 조합이 금세 네 가지가 된다.
  * 여기서 한 번 접어 두면 부르는 쪽은 언제나 같은 모양으로 쓴다.
  */
-export function WithAmount({
+function WithAmount({
   provider: Provider,
   children,
 }: {
@@ -56,4 +60,33 @@ export function WithAmount({
   children: (provided: ProvidedAmount | null) => ReactNode;
 }) {
   return Provider ? <Provider>{children}</Provider> : <>{children(null)}</>;
+}
+
+/**
+ * 여러 능력의 값을 한 번에 받는다. 온 순서는 넘긴 순서 그대로다.
+ *
+ * 값을 주려면 훅이 필요하고 훅은 조건부로 못 부르므로, 제공자마다 컴포넌트를 한 겹씩
+ * 두르는 수밖에 없다. 부르는 쪽에서 직접 두르면 금액이 셋만 돼도 **세 겹 중첩**이 되어
+ * 정작 읽어야 할 계산이 안쪽에 파묻힌다. 그 겹을 여기서 접는다.
+ *
+ * `providers` 는 부르는 쪽에서 길이가 고정된 배열로 넘긴다 — 겹의 수가 렌더마다 달라지면
+ * 그 안의 훅 순서가 흔들린다.
+ */
+export function WithAmounts({
+  providers,
+  children,
+}: {
+  providers: (ComponentType<AmountProviderProps> | null)[];
+  children: (provided: (ProvidedAmount | null)[]) => ReactNode;
+}) {
+  function fold(index: number, collected: (ProvidedAmount | null)[]): ReactNode {
+    if (index === providers.length) return children(collected);
+    return (
+      <WithAmount provider={providers[index]}>
+        {(value) => fold(index + 1, [...collected, value])}
+      </WithAmount>
+    );
+  }
+
+  return <>{fold(0, [])}</>;
 }
