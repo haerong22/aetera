@@ -1,8 +1,9 @@
 package io.aetera.model.goal
 
 import io.aetera.model.common.UserOwned
+import io.aetera.model.common.optionalText
+import io.aetera.model.common.requiredText
 import io.aetera.model.user.UserId
-import io.aetera.shared.error.CoreException
 import io.aetera.shared.error.ensure
 import java.time.Instant
 import java.time.LocalDate
@@ -130,16 +131,7 @@ class Goal private constructor(
             createdAt: Instant,
         ): Goal = Goal(id, userId, title, period, target, unit, progress, periodStart, createdAt)
 
-        private fun validateTitle(title: String): String {
-            val trimmed = title.trim()
-            if (trimmed.isEmpty() || trimmed.length > TITLE_MAX_LENGTH) {
-                throw CoreException(
-                    GoalErrorCode.INVALID_TITLE,
-                    "목표 이름은 1자 이상 ${TITLE_MAX_LENGTH}자 이하여야 합니다. 입력 길이: ${trimmed.length}",
-                )
-            }
-            return trimmed
-        }
+        private fun validateTitle(title: String): String = requiredText(title, TITLE_MAX_LENGTH, GoalErrorCode.INVALID_TITLE, "목표 이름")
 
         private fun validateTarget(target: Int): Int {
             ensure(
@@ -150,14 +142,6 @@ class Goal private constructor(
             return target
         }
 
-        private fun validateUnit(unit: String?): String? {
-            val trimmed = unit?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-            ensure(
-                trimmed.length <= UNIT_MAX_LENGTH,
-                GoalErrorCode.INVALID_UNIT,
-                "단위는 ${UNIT_MAX_LENGTH}자 이하여야 합니다. 입력 길이: ${trimmed.length}",
-            )
-            return trimmed
-        }
+        private fun validateUnit(unit: String?): String? = optionalText(unit, UNIT_MAX_LENGTH, GoalErrorCode.INVALID_UNIT, "단위")
     }
 }

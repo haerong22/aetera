@@ -1,8 +1,9 @@
 package io.aetera.model.income
 
 import io.aetera.model.common.UserOwned
+import io.aetera.model.common.optionalText
+import io.aetera.model.common.requiredText
 import io.aetera.model.user.UserId
-import io.aetera.shared.error.CoreException
 import io.aetera.shared.error.ensure
 import java.time.Instant
 
@@ -114,16 +115,7 @@ class IncomeSource private constructor(
             createdAt: Instant,
         ): IncomeSource = IncomeSource(id, userId, title, category, amount, cycle, memo, createdAt)
 
-        private fun validateTitle(title: String): String {
-            val trimmed = title.trim()
-            if (trimmed.isEmpty() || trimmed.length > TITLE_MAX_LENGTH) {
-                throw CoreException(
-                    IncomeErrorCode.INVALID_TITLE,
-                    "이름은 1자 이상 ${TITLE_MAX_LENGTH}자 이하여야 합니다. 입력 길이: ${trimmed.length}",
-                )
-            }
-            return trimmed
-        }
+        private fun validateTitle(title: String): String = requiredText(title, TITLE_MAX_LENGTH, IncomeErrorCode.INVALID_TITLE, "이름")
 
         private fun validateAmount(amount: Long): Long {
             ensure(
@@ -134,16 +126,7 @@ class IncomeSource private constructor(
             return amount
         }
 
-        private fun validateMemo(memo: String?): String? {
-            val trimmed = memo?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-            if (trimmed.length > MEMO_MAX_LENGTH) {
-                throw CoreException(
-                    IncomeErrorCode.MEMO_TOO_LONG,
-                    "메모는 ${MEMO_MAX_LENGTH}자 이하여야 합니다. 입력 길이: ${trimmed.length}",
-                )
-            }
-            return trimmed
-        }
+        private fun validateMemo(memo: String?): String? = optionalText(memo, MEMO_MAX_LENGTH, IncomeErrorCode.MEMO_TOO_LONG, "메모")
     }
 }
 

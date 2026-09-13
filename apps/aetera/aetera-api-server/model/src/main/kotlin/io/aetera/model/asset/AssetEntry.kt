@@ -1,8 +1,8 @@
 package io.aetera.model.asset
 
 import io.aetera.model.common.UserOwned
+import io.aetera.model.common.requiredText
 import io.aetera.model.user.UserId
-import io.aetera.shared.error.CoreException
 import io.aetera.shared.error.ensure
 import java.time.Instant
 import java.time.LocalDate
@@ -89,16 +89,7 @@ class AssetEntry private constructor(
             return normalized
         }
 
-        private fun validateName(name: String): String {
-            val trimmed = name.trim()
-            if (trimmed.isEmpty() || trimmed.length > NAME_MAX_LENGTH) {
-                throw CoreException(
-                    AssetErrorCode.INVALID_NAME,
-                    "이름은 1자 이상 ${NAME_MAX_LENGTH}자 이하여야 합니다. 입력 길이: ${trimmed.length}",
-                )
-            }
-            return trimmed
-        }
+        private fun validateName(name: String): String = requiredText(name, NAME_MAX_LENGTH, AssetErrorCode.INVALID_NAME, "이름")
 
         /**
          * 0 을 허용한다 — 잔액이 0 인 계좌도 "아직 갖고 있다"는 사실이다.

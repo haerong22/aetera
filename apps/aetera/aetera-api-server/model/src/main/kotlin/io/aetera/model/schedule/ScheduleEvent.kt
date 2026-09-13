@@ -1,8 +1,8 @@
 package io.aetera.model.schedule
 
 import io.aetera.model.common.UserOwned
+import io.aetera.model.common.requiredText
 import io.aetera.model.user.UserId
-import io.aetera.shared.error.CoreException
 import io.aetera.shared.error.ensure
 import java.time.Instant
 
@@ -105,16 +105,8 @@ class ScheduleEvent private constructor(
             createdAt: Instant,
         ): ScheduleEvent = ScheduleEvent(id, userId, title, description, startsAt, endsAt, allDay, color, createdAt)
 
-        private fun validateTitle(title: String): String {
-            val trimmed = title.trim()
-            if (trimmed.isEmpty() || trimmed.length > TITLE_MAX_LENGTH) {
-                throw CoreException(
-                    ScheduleErrorCode.INVALID_EVENT_TITLE,
-                    "일정 제목은 1자 이상 ${TITLE_MAX_LENGTH}자 이하여야 합니다. 입력 길이: ${trimmed.length}",
-                )
-            }
-            return trimmed
-        }
+        private fun validateTitle(title: String): String =
+            requiredText(title, TITLE_MAX_LENGTH, ScheduleErrorCode.INVALID_EVENT_TITLE, "일정 제목")
 
         private fun validatePeriod(
             startsAt: Instant,
