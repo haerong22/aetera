@@ -25,7 +25,6 @@ export interface Income {
   /** 일을 그만둬도 이어지는 돈인지. 분류에서 나오지만 화면이 규칙을 또 갖지 않도록 서버가 말해 준다. */
   continuesAfterLeaving: boolean;
   memo?: string;
-  createdAt: string;
 }
 
 /** 목록과 합계는 늘 함께 온다 — 항목이 바뀌면 합계도 함께 움직인다. */

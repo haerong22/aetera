@@ -25,7 +25,6 @@ export interface Expense {
   /** 주기가 달라도 견줄 수 있게 서버가 환산해 준 값. */
   yearlyAmount: number;
   memo?: string;
-  createdAt: string;
 }
 
 /** 목록과 합계는 늘 함께 온다 — 항목이 바뀌면 합계도 함께 움직인다. */

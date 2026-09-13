@@ -11,7 +11,6 @@ export interface ScheduleEvent {
   endsAt: string;
   allDay: boolean;
   color?: string;
-  createdAt: string;
 }
 
 export interface ScheduleEventInput {

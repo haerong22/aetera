@@ -30,7 +30,6 @@ export interface Renewal {
   noticeDays: number;
   memo?: string;
   nextExpiresAt?: string;
-  createdAt: string;
 }
 
 interface RenewalInput {
