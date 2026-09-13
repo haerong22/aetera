@@ -1,11 +1,12 @@
 import { ShieldCheck } from "lucide-react";
 import type { FrontendModule } from "../types";
 import { RenewalPage } from "./RenewalPage";
+import { RENEWAL_MODULE_ID } from "./id";
 
 export const renewalModule: FrontendModule = {
-  id: "renewal",
+  id: RENEWAL_MODULE_ID,
   title: "만기 관리",
   icon: ShieldCheck,
   Page: RenewalPage,
-  queryKeyPrefix: "renewal",
+  queryKeyPrefix: RENEWAL_MODULE_ID,
 };

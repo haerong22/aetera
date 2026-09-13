@@ -2,9 +2,10 @@ import { DoorOpen } from "lucide-react";
 import { guideModule } from "../guide/module";
 import { RunwayTool } from "./RunwayTool";
 import { SeveranceTaxTool } from "./SeveranceTaxTool";
+import { RESIGNATION_MODULE_ID } from "./id";
 
 export const resignationModule = guideModule({
-  id: "resignation",
+  id: RESIGNATION_MODULE_ID,
   title: "퇴사 준비",
   icon: DoorOpen,
   // 공용 가이드 화면에 넣으면 이사 준비 가이드까지 이 도구들을 짊어지므로, 붙일 자리를 여기서 정한다.
