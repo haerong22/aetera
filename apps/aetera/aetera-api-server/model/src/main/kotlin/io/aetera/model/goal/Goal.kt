@@ -74,6 +74,11 @@ class Goal private constructor(
         amount: Int,
         today: LocalDate,
     ) {
+        ensure(
+            amount in -PROGRESS_STEP_MAX..PROGRESS_STEP_MAX,
+            GoalErrorCode.INVALID_PROGRESS,
+            "한 번에 옮길 수 있는 진행도는 ${PROGRESS_STEP_MAX}까지입니다. 입력: $amount",
+        )
         rollOverIfNeeded(today)
         progress = (progress + amount).coerceAtLeast(0)
     }
@@ -97,6 +102,9 @@ class Goal private constructor(
         private const val TITLE_MAX_LENGTH = 100
         private const val UNIT_MAX_LENGTH = 10
         private const val TARGET_MAX = 100_000
+
+        /** 한 번에 옮길 수 있는 진행도. 목표치와 같은 눈금이라 그보다 크게 옮길 이유가 없다. */
+        private const val PROGRESS_STEP_MAX = 100_000
 
         fun create(
             id: GoalId,

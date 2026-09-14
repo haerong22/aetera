@@ -3,8 +3,10 @@ package io.aetera.usecase.module
 import io.aetera.model.module.ModuleEnrollment
 import io.aetera.model.module.ModuleEnrollmentId
 import io.aetera.model.module.ModuleEnrollmentRepository
+import io.aetera.model.module.ModuleErrorCode
 import io.aetera.model.module.ModuleId
 import io.aetera.model.user.UserId
+import io.aetera.shared.error.ensure
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
@@ -16,6 +18,10 @@ class ReorderModulesService(
     private val moduleEnrollmentRepository: ModuleEnrollmentRepository,
     private val clock: Clock,
 ) {
+    private companion object {
+        const val MAX_ORDER_SIZE = 100
+    }
+
     /**
      * 받은 목록 순서대로 다시 매긴다.
      *
@@ -29,6 +35,14 @@ class ReorderModulesService(
         userId: UUID,
         moduleIds: List<String>,
     ): List<ModuleSummaryDto> {
+        // 상한이 Req 에만 있어 여기로 들어왔다. 배포된 모듈 수보다 한참 크게 잡아 두고,
+        // 그 위는 순서 매기기가 아니라 쓰기 폭탄으로 본다.
+        ensure(
+            moduleIds.isNotEmpty() && moduleIds.size <= MAX_ORDER_SIZE,
+            ModuleErrorCode.INVALID_MODULE_ORDER,
+            "모듈 순서는 1개 이상 ${MAX_ORDER_SIZE}개 이하로 보내야 합니다. 받은 개수: ${moduleIds.size}",
+        )
+
         val owner = UserId(userId)
         val enrollments =
             moduleEnrollmentRepository.findAllByUserId(owner).associateByTo(mutableMapOf()) { it.moduleId }

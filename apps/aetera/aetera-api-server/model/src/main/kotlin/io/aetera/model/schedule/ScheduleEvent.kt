@@ -1,6 +1,7 @@
 package io.aetera.model.schedule
 
 import io.aetera.model.common.UserOwned
+import io.aetera.model.common.optionalText
 import io.aetera.model.common.requiredText
 import io.aetera.model.user.UserId
 import io.aetera.shared.error.ensure
@@ -51,7 +52,7 @@ class ScheduleEvent private constructor(
     ) {
         validatePeriod(startsAt, endsAt)
         this.title = validateTitle(title)
-        this.description = description?.takeIf { it.isNotBlank() }
+        this.description = validateDescription(description)
         this.startsAt = startsAt
         this.endsAt = endsAt
         this.allDay = allDay
@@ -66,6 +67,7 @@ class ScheduleEvent private constructor(
 
     companion object {
         private const val TITLE_MAX_LENGTH = 200
+        private const val DESCRIPTION_MAX_LENGTH = 2000
         private val COLOR_PATTERN = Regex("^#[0-9a-fA-F]{6}$")
 
         fun create(
@@ -84,7 +86,7 @@ class ScheduleEvent private constructor(
                 id = id,
                 userId = userId,
                 title = validateTitle(title),
-                description = description?.takeIf { it.isNotBlank() },
+                description = validateDescription(description),
                 startsAt = startsAt,
                 endsAt = endsAt,
                 allDay = allDay,
@@ -107,6 +109,10 @@ class ScheduleEvent private constructor(
 
         private fun validateTitle(title: String): String =
             requiredText(title, TITLE_MAX_LENGTH, ScheduleErrorCode.INVALID_EVENT_TITLE, "일정 제목")
+
+        /** 길이 상한이 Req 에만 있어 모델로 들어왔다. 공백만 친 설명을 null 로 접는 건 원래 하던 일이다. */
+        private fun validateDescription(description: String?): String? =
+            optionalText(description, DESCRIPTION_MAX_LENGTH, ScheduleErrorCode.INVALID_EVENT_DESCRIPTION, "일정 설명")
 
         private fun validatePeriod(
             startsAt: Instant,

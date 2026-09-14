@@ -9,6 +9,7 @@ enum class ModuleErrorCode(
     override val defaultMessage: String,
 ) : ErrorCode {
     INVALID_MODULE_ID(ErrorKind.INVALID_INPUT, ErrorCode.MODULE_BAND + 1, "모듈 아이디 형식이 올바르지 않습니다."),
+    INVALID_MODULE_ORDER(ErrorKind.INVALID_INPUT, ErrorCode.MODULE_BAND + 2, "모듈 순서 목록이 올바르지 않습니다."),
 
     MODULE_NOT_ENABLED(ErrorKind.FORBIDDEN, ErrorCode.MODULE_BAND + 1, "사용 설정하지 않은 모듈입니다."),
 
