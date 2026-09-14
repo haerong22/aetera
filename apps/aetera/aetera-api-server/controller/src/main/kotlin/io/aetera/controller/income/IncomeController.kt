@@ -8,7 +8,6 @@ import io.aetera.usecase.income.IncomeBoardDto
 import io.aetera.usecase.income.UpdateIncomeService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,7 +44,7 @@ class IncomeController(
     @Operation(summary = "소득 등록")
     fun create(
         @CurrentUserId userId: UUID,
-        @Valid @RequestBody req: IncomeReq,
+        @RequestBody req: IncomeReq,
     ): IncomeBoardDto = createIncomeService.create(req.toCommand(userId))
 
     @PutMapping("/{income-id}")
@@ -53,7 +52,7 @@ class IncomeController(
     fun update(
         @CurrentUserId userId: UUID,
         @PathVariable("income-id") incomeId: UUID,
-        @Valid @RequestBody req: IncomeReq,
+        @RequestBody req: IncomeReq,
     ): IncomeBoardDto = updateIncomeService.update(incomeId, req.toCommand(userId))
 
     @DeleteMapping("/{income-id}")

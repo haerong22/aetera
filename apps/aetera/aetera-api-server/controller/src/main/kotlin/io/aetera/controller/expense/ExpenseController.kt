@@ -8,7 +8,6 @@ import io.aetera.usecase.expense.FindExpensesService
 import io.aetera.usecase.expense.UpdateExpenseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,7 +44,7 @@ class ExpenseController(
     @Operation(summary = "고정지출 등록")
     fun create(
         @CurrentUserId userId: UUID,
-        @Valid @RequestBody req: ExpenseReq,
+        @RequestBody req: ExpenseReq,
     ): ExpenseBoardDto = createExpenseService.create(req.toCommand(userId))
 
     @PutMapping("/{expense-id}")
@@ -53,7 +52,7 @@ class ExpenseController(
     fun update(
         @CurrentUserId userId: UUID,
         @PathVariable("expense-id") expenseId: UUID,
-        @Valid @RequestBody req: ExpenseReq,
+        @RequestBody req: ExpenseReq,
     ): ExpenseBoardDto = updateExpenseService.update(expenseId, req.toCommand(userId))
 
     @DeleteMapping("/{expense-id}")

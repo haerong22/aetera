@@ -10,7 +10,6 @@ import io.aetera.usecase.auth.SignUpService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -33,13 +32,13 @@ class AuthController(
     @PostMapping("/signup")
     @Operation(summary = "회원 가입. 가입 즉시 로그인 세션을 발급한다.")
     fun signUp(
-        @Valid @RequestBody req: SignUpReq,
+        @RequestBody req: SignUpReq,
     ): ResponseEntity<AuthSessionRes> = sessionResponse(signUpService.signUp(req.toCommand()), HttpStatus.CREATED)
 
     @PostMapping("/login")
     @Operation(summary = "이메일 로그인")
     fun login(
-        @Valid @RequestBody req: LoginReq,
+        @RequestBody req: LoginReq,
     ): ResponseEntity<AuthSessionRes> = sessionResponse(loginService.login(req.toCommand()))
 
     @PostMapping("/refresh")

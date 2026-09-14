@@ -35,6 +35,11 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(ErrorRes(code, e.message))
     }
 
+    /*
+     * 아래 둘은 지금 아무것도 잡지 않는다 — Req 에 제약 애너테이션이 하나도 없고 @Valid 도 없다.
+     * 그래도 남겨 둔다. 여기는 예외를 응답으로 바꾸는 유일한 지점이라, 누군가 Bean Validation 을
+     * 다시 들였을 때 핸들러가 없으면 400 이어야 할 것이 조용히 500 으로 나간다.
+     */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleBodyValidation(e: MethodArgumentNotValidException): ResponseEntity<ErrorRes> {
         val detail =

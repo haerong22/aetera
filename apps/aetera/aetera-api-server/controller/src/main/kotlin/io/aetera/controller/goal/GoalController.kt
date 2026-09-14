@@ -9,7 +9,6 @@ import io.aetera.usecase.goal.GoalDto
 import io.aetera.usecase.goal.UpdateGoalService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -48,7 +47,7 @@ class GoalController(
     @Operation(summary = "목표 등록")
     fun create(
         @CurrentUserId userId: UUID,
-        @Valid @RequestBody req: GoalReq,
+        @RequestBody req: GoalReq,
     ): ResponseEntity<GoalDto> {
         val created = createGoalService.create(req.toCommand(userId))
         return ResponseEntity.created(URI.create("/api/v1/modules/goal/goals/${created.id}")).body(created)
@@ -59,7 +58,7 @@ class GoalController(
     fun update(
         @CurrentUserId userId: UUID,
         @PathVariable("goal-id") goalId: UUID,
-        @Valid @RequestBody req: GoalReq,
+        @RequestBody req: GoalReq,
     ): GoalDto = updateGoalService.update(goalId, req.toCommand(userId))
 
     @PostMapping("/{goal-id}/progress")
@@ -67,7 +66,7 @@ class GoalController(
     fun addProgress(
         @CurrentUserId userId: UUID,
         @PathVariable("goal-id") goalId: UUID,
-        @Valid @RequestBody(required = false) req: AddProgressReq?,
+        @RequestBody(required = false) req: AddProgressReq?,
     ): GoalDto = addGoalProgressService.addProgress(userId, goalId, req?.amount ?: 1)
 
     @DeleteMapping("/{goal-id}")

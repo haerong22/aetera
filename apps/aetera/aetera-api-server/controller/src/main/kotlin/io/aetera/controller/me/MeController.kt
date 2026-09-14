@@ -10,7 +10,6 @@ import io.aetera.usecase.user.GetMyProfileService
 import io.aetera.usecase.user.UserDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -54,7 +53,7 @@ class MeController(
     @Operation(summary = "모듈 순서 변경. 보낸 목록 순서대로 사이드바에 놓인다.")
     fun reorderModules(
         @CurrentUserId userId: UUID,
-        @Valid @RequestBody req: ReorderModulesReq,
+        @RequestBody req: ReorderModulesReq,
     ): List<ModuleSummaryDto> = reorderModulesService.reorder(userId, req.moduleIds)
 
     @DeleteMapping("/modules/{module-id}/enablement")

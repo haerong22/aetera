@@ -10,7 +10,6 @@ import io.aetera.usecase.schedule.UpdateScheduleEventService
 import io.aetera.usecase.schedule.cmd.FindScheduleEventsCommand
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -46,7 +45,7 @@ class ScheduleEventController(
     @Operation(summary = "일정 생성")
     fun create(
         @CurrentUserId userId: UUID,
-        @Valid @RequestBody req: ScheduleEventReq,
+        @RequestBody req: ScheduleEventReq,
     ): ResponseEntity<ScheduleEventDto> {
         val event = createScheduleEventService.create(req.toCreateCommand(userId))
         return ResponseEntity
@@ -80,7 +79,7 @@ class ScheduleEventController(
     fun update(
         @CurrentUserId userId: UUID,
         @PathVariable("event-id") eventId: UUID,
-        @Valid @RequestBody req: ScheduleEventReq,
+        @RequestBody req: ScheduleEventReq,
     ): ScheduleEventDto = updateScheduleEventService.update(req.toUpdateCommand(userId, eventId))
 
     @DeleteMapping("/{event-id}")

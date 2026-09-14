@@ -9,7 +9,6 @@ import io.aetera.usecase.renewal.RenewalDto
 import io.aetera.usecase.renewal.UpdateRenewalService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -48,7 +47,7 @@ class RenewalController(
     @Operation(summary = "만기 항목 등록")
     fun create(
         @CurrentUserId userId: UUID,
-        @Valid @RequestBody req: RenewalReq,
+        @RequestBody req: RenewalReq,
     ): ResponseEntity<RenewalDto> {
         val created = createRenewalService.create(req.toCommand(userId))
         return ResponseEntity.created(URI.create("/api/v1/modules/renewal/items/${created.id}")).body(created)
@@ -59,7 +58,7 @@ class RenewalController(
     fun update(
         @CurrentUserId userId: UUID,
         @PathVariable("renewal-id") renewalId: UUID,
-        @Valid @RequestBody req: RenewalReq,
+        @RequestBody req: RenewalReq,
     ): RenewalDto = updateRenewalService.update(renewalId, req.toCommand(userId))
 
     @PostMapping("/{renewal-id}/renewals")

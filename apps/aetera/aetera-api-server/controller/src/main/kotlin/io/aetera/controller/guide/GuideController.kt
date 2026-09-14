@@ -8,7 +8,6 @@ import io.aetera.usecase.guide.StartGuideJourneyService
 import io.aetera.usecase.guide.UpdateGuideTaskService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -50,7 +49,7 @@ class GuideController(
     fun startJourney(
         @CurrentUserId userId: UUID,
         @PathVariable("guide-id") guideId: String,
-        @Valid @RequestBody req: StartGuideJourneyReq,
+        @RequestBody req: StartGuideJourneyReq,
     ): GuideViewDto = startGuideJourneyService.start(req.toCommand(userId, guideId))
 
     @DeleteMapping("/journey")
@@ -66,6 +65,6 @@ class GuideController(
         @CurrentUserId userId: UUID,
         @PathVariable("guide-id") guideId: String,
         @PathVariable("task-key") taskKey: String,
-        @Valid @RequestBody req: UpdateGuideTaskReq,
+        @RequestBody req: UpdateGuideTaskReq,
     ): GuideViewDto = updateGuideTaskService.updateTask(req.toCommand(userId, guideId, taskKey))
 }
