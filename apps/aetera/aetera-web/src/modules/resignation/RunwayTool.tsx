@@ -7,6 +7,7 @@ import { localToday } from "@/lib/date";
 import { won } from "@/lib/money";
 import {
   WithAmounts,
+  missingProviders,
   useCashOnHand,
   useContinuingIncome,
   useMonthlyFixedCost,
@@ -162,11 +163,11 @@ export function RunwayTool() {
   const linkFixedCost = MonthlyFixedCost !== null && !overridden.fixedCost;
   const linkIncome = ContinuingIncome !== null && !overridden.income;
 
-  const missing = [
-    CashOnHand ? null : "자산",
-    MonthlyFixedCost ? null : "고정지출",
-    ContinuingIncome ? null : "소득",
-  ].filter((name): name is string => name !== null);
+  const missing = missingProviders([
+    ["자산", CashOnHand],
+    ["고정지출", MonthlyFixedCost],
+    ["소득", ContinuingIncome],
+  ]);
 
   const setTyped: Record<Field, (value: string) => void> = {
     cash: setTypedCash,

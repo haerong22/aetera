@@ -14,6 +14,7 @@ import { AeteraBriefingCard } from "@/components/dashboard/AeteraBriefingCard";
 import { TodayScheduleCard } from "@/components/dashboard/TodayScheduleCard";
 import { WeeklyGoalsCard } from "@/components/dashboard/WeeklyGoalsCard";
 import { UpcomingTimelineCard } from "@/components/dashboard/UpcomingTimelineCard";
+import { MonthlyLeftoverCard } from "@/components/dashboard/MonthlyLeftoverCard";
 
 /**
  * 오늘 중심 Life Dashboard.
@@ -22,8 +23,11 @@ import { UpcomingTimelineCard } from "@/components/dashboard/UpcomingTimelineCar
  * 지어낸 값을 보여 줬는데, 근거 없는 것을 확정된 분석처럼 내놓지 않기로 하고 걷어냈다.
  * 비워 둔 자리 하나는 타임라인이 생기면서 실제 데이터로 채웠다.
  *
- * DOM 순서 = 모바일(1열) 표시 순서: 헤더 → 브리핑 → 일정 → 목표 → 다가오는 일.
- * 데스크톱(lg)에서는 일정 7 + 목표 5, 다가오는 일은 아래 한 줄을 다 쓴다.
+ * 위에서 아래로 보는 시간이 넓어진다: 오늘(일정) → 이번 주(목표) → 이번 달(셈) → 앞으로(타임라인).
+ * DOM 순서 = 모바일(1열) 표시 순서이고, 데스크톱(lg)에서는 일정 7 + 목표 5 만 나란히 선다.
+ *
+ * 이번 달 셈만 `enabled` 를 받지 않는다. 한 모듈이 아니라 **두 모듈을 곱해서** 나오는 답이라
+ * 어느 것이 켜졌는지는 능력 레지스트리가 알고, 카드가 스스로 무엇이 모자란지 말한다.
  */
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -74,6 +78,10 @@ export default function DashboardPage() {
 
       <div className="lg:col-span-5">
         <WeeklyGoalsCard enabled={goalEnabled} />
+      </div>
+
+      <div className="lg:col-span-12">
+        <MonthlyLeftoverCard />
       </div>
 
       <div className="lg:col-span-12">

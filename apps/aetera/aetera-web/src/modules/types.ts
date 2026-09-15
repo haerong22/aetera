@@ -18,6 +18,8 @@ export interface ModuleCapabilities {
   CashOnHand?: ComponentType<AmountProviderProps>;
   /** 일을 그만둬도 이어지는 한 달 소득. 전체 소득이 아니다 — 월급은 빠져 있다. */
   ContinuingIncome?: ComponentType<AmountProviderProps>;
+  /** 한 달에 들어오는 돈 전부. 월급을 포함한다. */
+  MonthlyIncome?: ComponentType<AmountProviderProps>;
 }
 
 /**

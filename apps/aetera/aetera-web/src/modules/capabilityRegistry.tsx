@@ -46,6 +46,21 @@ export function useContinuingIncome(): Capability<"ContinuingIncome"> {
   return useCapability("ContinuingIncome");
 }
 
+export function useMonthlyIncome(): Capability<"MonthlyIncome"> {
+  return useCapability("MonthlyIncome");
+}
+
+/**
+ * 아직 못 찾은 능력들의 이름. 넘긴 순서 그대로 온다.
+ *
+ * 능력이 없을 때 그 자리를 비워 두기만 하면 사용자는 **왜 안 보이는지 알 길이 없다.**
+ * 무엇을 켜야 하는지 말해 주려면 "빠진 것들의 이름"이 필요한데, 부르는 쪽마다 적으면
+ * 타입 서술 필터가 화면 수만큼 늘어난다.
+ */
+export function missingProviders(entries: [string, unknown][]): string[] {
+  return entries.filter(([, provider]) => !provider).map(([name]) => name);
+}
+
 /**
  * 능력이 있으면 그 값을, 없으면 `null` 을 준 채로 자식을 그린다.
  *
