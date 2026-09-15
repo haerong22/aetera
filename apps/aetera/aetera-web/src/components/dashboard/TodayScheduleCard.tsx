@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Puzzle } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { ModuleOffCard } from "./ModuleOffCard";
 import { Spinner } from "@/components/ui/Spinner";
 import { cn } from "@/components/ui/cn";
 import { formatTime } from "@/modules/schedule/calendar";
@@ -22,15 +23,10 @@ interface TodayScheduleCardProps {
 export function TodayScheduleCard({ events, isLoading, isError }: TodayScheduleCardProps) {
   if (events === null) {
     return (
-      <Card className="flex h-full flex-col items-center justify-center gap-3 py-10 text-center">
-        <span className="flex size-11 items-center justify-center rounded-2xl bg-primary-light text-primary">
-          <Puzzle size={20} />
-        </span>
-        <p className="text-[15px] font-semibold text-grey-800">일정 모듈을 켜면 오늘 일정이 여기 표시돼요</p>
-        <Link href="/settings/modules" className="text-[14px] font-semibold text-primary hover:underline">
-          모듈 살펴보기
-        </Link>
-      </Card>
+      <ModuleOffCard
+        message="일정 모듈을 켜면 오늘 일정이 여기 표시돼요"
+        matchHeight
+      />
     );
   }
 

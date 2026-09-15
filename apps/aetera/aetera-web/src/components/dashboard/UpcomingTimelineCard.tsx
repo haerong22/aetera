@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, History, Puzzle } from "lucide-react";
+import { ArrowRight, History } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { ModuleOffCard } from "./ModuleOffCard";
 import { Spinner } from "@/components/ui/Spinner";
 import { daysUntil, localToday, toLocalDateIso } from "@/lib/date";
 import { useTimeline } from "@/modules/timeline/api";
@@ -43,17 +44,7 @@ export function UpcomingTimelineCard({ enabled }: { enabled: boolean }) {
 
   if (!enabled) {
     return (
-      <Card className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-        <span className="flex size-11 items-center justify-center rounded-2xl bg-primary-light text-primary">
-          <Puzzle size={20} aria-hidden />
-        </span>
-        <p className="text-[15px] font-semibold text-grey-800">
-          타임라인 모듈을 켜면 다가오는 일이 여기 표시돼요
-        </p>
-        <Link href="/settings/modules" className="text-[14px] font-semibold text-primary hover:underline">
-          모듈 살펴보기
-        </Link>
-      </Card>
+      <ModuleOffCard message="타임라인 모듈을 켜면 다가오는 일이 여기 표시돼요" />
     );
   }
 
