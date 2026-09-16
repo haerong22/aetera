@@ -7,6 +7,8 @@
     "build": {
       "executor": "nx:run-commands",
       "cache": true,
+      "//": "test 를 먼저 돌린다. CI 는 `nx run-many -t build` 만 부르는데, gradle build 와 달리 next build 에는 테스트가 들어 있지 않다.",
+      "dependsOn": ["test"],
       "inputs": [
         "production",
         "{projectRoot}/package-lock.json",
@@ -16,6 +18,15 @@
       "options": {
         "cwd": "apps/aetera/aetera-web",
         "command": "npm run build"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/package-lock.json"],
+      "options": {
+        "cwd": "apps/aetera/aetera-web",
+        "command": "npm run test"
       }
     },
     "lint": {
