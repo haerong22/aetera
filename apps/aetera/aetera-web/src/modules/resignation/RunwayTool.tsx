@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { SummaryCard } from "@/components/ui/SummaryCard";
 import { MoneyInput, ReadOnlyMoney } from "@/components/ui/MoneyInput";
-import { localToday } from "@/lib/date";
 import { won } from "@/lib/money";
 import {
   WithAmounts,
@@ -13,26 +12,8 @@ import {
   useMonthlyFixedCost,
 } from "../capabilityRegistry";
 import { TaskToolPanel } from "../guide/components/TaskToolPanel";
+import { formatRunsOut, runwayMonths } from "./runway";
 import type { ProvidedAmount } from "../types";
-
-/** 한 달의 평균 길이. 개월 수를 날짜로 되돌릴 때만 쓴다. */
-const DAYS_PER_MONTH = 30.44;
-
-/**
- * 돈이 떨어지는 달.
- *
- * 개월 수를 **날짜로 환산해 오늘에 더한다.** 달 단위로 더하면서 1일로 옮기면
- * "오늘이 31일"이라는 사실과 소수부(0.8개월 ≈ 24일)가 함께 날아가 한 달이 앞당겨진다.
- * 일 단위 덧셈은 말일 넘침도 알아서 처리한다.
- *
- * 날짜까지는 말하지 않는다 — "대략 몇 달"에서 나온 값이라 하루 단위로 찍으면
- * 계산이 실제보다 정밀해 보인다.
- */
-function formatRunsOut(months: number): string {
-  const date = localToday();
-  date.setDate(date.getDate() + Math.round(months * DAYS_PER_MONTH));
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-}
 
 function Result({
   cash,
@@ -43,17 +24,12 @@ function Result({
   monthlyBurn: number;
   monthlyIncome: number;
 }) {
-  // 나가는 돈이 없으면 답할 수 없다. 가진 돈이 0 이어도 마찬가지다.
-  if (cash <= 0 || monthlyBurn <= 0) return null;
+  const runway = runwayMonths(cash, monthlyBurn, monthlyIncome);
 
-  /** 실제로 통장이 줄어드는 속도. 들어오는 돈이 그만큼 나가는 돈을 메운다. */
-  const netBurn = monthlyBurn - monthlyIncome;
+  // 셈이 성립하지 않으면 아무것도 그리지 않는다.
+  if (runway.kind === "unknown") return null;
 
-  /*
-   * 들어오는 돈이 나가는 돈을 넘으면 바닥나는 달이 없다.
-   * 큰 숫자로 적으면 "9999개월 버팀" 같은 거짓말이 되므로 개월 수를 아예 말하지 않는다.
-   */
-  if (netBurn <= 0) {
+  if (runway.kind === "never") {
     return (
       <SummaryCard className="mt-4">
         <div>
@@ -70,20 +46,18 @@ function Result({
     );
   }
 
-  const months = cash / netBurn;
-
   return (
     <SummaryCard className="mt-4">
       <div>
         <p className="text-[13px] font-medium text-grey-600">지금 가진 돈으로</p>
         <p className="mt-0.5 text-[28px] leading-tight font-bold text-primary tabular-nums">
-          약 {months.toFixed(1)}개월
+          약 {runway.months.toFixed(1)}개월
         </p>
       </div>
       <div className="text-right">
-        <p className="text-[13px] font-medium text-grey-600">{formatRunsOut(months)}쯤 바닥</p>
+        <p className="text-[13px] font-medium text-grey-600">{formatRunsOut(runway.months)}쯤 바닥</p>
         <p className="mt-0.5 text-[13px] text-grey-600 tabular-nums">
-          한 달 {won(netBurn)}씩 줄어요
+          한 달 {won(runway.netBurn)}씩 줄어요
         </p>
       </div>
     </SummaryCard>
