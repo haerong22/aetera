@@ -15,6 +15,7 @@ import { TodayScheduleCard } from "@/components/dashboard/TodayScheduleCard";
 import { WeeklyGoalsCard } from "@/components/dashboard/WeeklyGoalsCard";
 import { UpcomingTimelineCard } from "@/components/dashboard/UpcomingTimelineCard";
 import { MonthlyLeftoverCard } from "@/components/dashboard/MonthlyLeftoverCard";
+import { WelcomeCard, useWelcome } from "@/components/dashboard/WelcomeCard";
 
 /**
  * 오늘 중심 Life Dashboard.
@@ -31,8 +32,10 @@ import { MonthlyLeftoverCard } from "@/components/dashboard/MonthlyLeftoverCard"
  */
 export default function DashboardPage() {
   const { user } = useAuth();
-  // 목록 자체는 안 쓰고 로딩·실패만 본다. 어느 모듈을 켰는지는 useModuleEnabled 가 답한다.
   const { isPending: modulesPending, isError: modulesFailed, refetch } = useMyModules();
+
+  /** 처음 온 사람에게 무엇부터 켤지 권할지. 판정은 카드 쪽이 갖고 있다. */
+  const welcome = useWelcome();
 
   const scheduleEnabled = useModuleEnabled(SCHEDULE_MODULE_ID);
   const goalEnabled = useModuleEnabled(GOAL_MODULE_ID);
@@ -65,6 +68,12 @@ export default function DashboardPage() {
         />
       </div>
 
+      {welcome && (
+        <div className="lg:col-span-12">
+          <WelcomeCard />
+        </div>
+      )}
+
       {/* 요약할 일정이 없으면 그리지 않는다 — "모듈을 켜세요" 는 아래 카드가 이미 말한다. */}
       {events !== null && (
         <div className="lg:col-span-12">
@@ -72,21 +81,25 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="lg:col-span-7">
-        <TodayScheduleCard events={events} isLoading={eventsLoading} isError={eventsFailed} />
-      </div>
+      {!welcome && (
+        <>
+          <div className="lg:col-span-7">
+            <TodayScheduleCard events={events} isLoading={eventsLoading} isError={eventsFailed} />
+          </div>
 
-      <div className="lg:col-span-5">
-        <WeeklyGoalsCard enabled={goalEnabled} />
-      </div>
+          <div className="lg:col-span-5">
+            <WeeklyGoalsCard enabled={goalEnabled} />
+          </div>
 
-      <div className="lg:col-span-12">
-        <MonthlyLeftoverCard />
-      </div>
+          <div className="lg:col-span-12">
+            <MonthlyLeftoverCard />
+          </div>
 
-      <div className="lg:col-span-12">
-        <UpcomingTimelineCard enabled={timelineEnabled} />
-      </div>
+          <div className="lg:col-span-12">
+            <UpcomingTimelineCard enabled={timelineEnabled} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
