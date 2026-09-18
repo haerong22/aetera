@@ -65,6 +65,20 @@ class Renewal private constructor(
         expiresAt = nextExpiryFrom(today)
     }
 
+    /**
+     * 지금 알려야 하는가 — 만기가 [noticeDays] 안으로 들어왔거나 이미 지났는가.
+     *
+     * "언제부터 급한가"는 항목마다 다르다. 여권은 6개월 전, 보험은 한 달 전이다.
+     *
+     * 지난 것도 포함한다. 만기가 지났는데 아직 갱신하지 않았다면 그게 가장 급한 일이고,
+     * 조용해지는 순간 놓친 것을 영영 모른다.
+     *
+     * **같은 규칙이 브라우저에도 있다**(`modules/renewal/labels.ts` 의 `renewalStatus`).
+     * 합칠 수 없어서 둘이다 — 서버는 줄을 색칠할 수 없고 브라우저는 메일을 보낼 수 없다.
+     * 한쪽을 고치면 다른 쪽도 고친다.
+     */
+    fun needsNotice(today: LocalDate): Boolean = !expiresAt.isAfter(today.plusDays(noticeDays.toLong()))
+
     /** 갱신하면 언제가 되는지. 화면이 미리 보여줄 수 있도록 계산만 따로 꺼내 둔다. */
     fun nextExpiryFrom(today: LocalDate): LocalDate {
         ensure(cycle.repeats, RenewalErrorCode.CYCLE_NOT_REPEATABLE, "주기가 없는 항목입니다. id=$id")

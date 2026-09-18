@@ -26,6 +26,10 @@ type RenewalStatus = "expired" | "due" | "fine";
 /**
  * 만기 상태는 브라우저가 정한다 — 서버는 사용자의 로컬 날짜를 모른다.
  * "언제부터 급한가"는 항목마다 다르므로 noticeDays 를 쓴다(여권은 6개월 전, 보험은 한 달 전).
+ *
+ * **같은 규칙이 서버에도 있다**(`Renewal.needsNotice`). 저쪽은 알림 메일을 보낼지 정한다.
+ * 합칠 수 없어서 둘이다 — 브라우저는 메일을 보낼 수 없고 서버는 줄을 색칠할 수 없다.
+ * 한쪽을 고치면 다른 쪽도 고친다.
  */
 export function renewalStatus(renewal: Renewal): RenewalStatus {
   const days = daysUntil(renewal.expiresAt);

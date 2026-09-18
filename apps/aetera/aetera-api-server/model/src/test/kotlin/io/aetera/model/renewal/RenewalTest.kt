@@ -60,6 +60,32 @@ class RenewalTest :
             }
         }
 
+        describe("needsNotice") {
+            it("알림일 밖이면 아직 조용하다") {
+                renewal(expiresAt = today.plusDays(31), noticeDays = 30).needsNotice(today) shouldBe false
+            }
+
+            it("알림일에 딱 들어오면 알린다") {
+                renewal(expiresAt = today.plusDays(30), noticeDays = 30).needsNotice(today) shouldBe true
+            }
+
+            it("오늘 만기면 알린다") {
+                renewal(expiresAt = today, noticeDays = 30).needsNotice(today) shouldBe true
+            }
+
+            // 갱신하지 않은 채 만기가 지났다면 그게 가장 급하다 — 조용해지면 놓친 것을 영영 모른다.
+            it("지난 만기도 계속 알린다") {
+                renewal(expiresAt = today.minusDays(100), noticeDays = 30).needsNotice(today) shouldBe true
+            }
+
+            // 여권은 6개월 전, 보험은 한 달 전. 언제부터 급한지는 항목이 정한다.
+            it("알림일은 항목마다 다르다") {
+                val far = today.plusDays(100)
+                renewal(expiresAt = far, noticeDays = 30).needsNotice(today) shouldBe false
+                renewal(expiresAt = far, noticeDays = 180).needsNotice(today) shouldBe true
+            }
+        }
+
         describe("renew") {
             it("만기 전에 미리 갱신하면 기존 만기부터 이어진다") {
                 val target = renewal(expiresAt = LocalDate.of(2026, 9, 30))
