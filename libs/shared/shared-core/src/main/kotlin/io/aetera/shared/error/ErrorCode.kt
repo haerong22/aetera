@@ -43,5 +43,6 @@ interface ErrorCode {
         const val ASSET_BAND: Int = 9 * BAND_SIZE
         const val TIMELINE_BAND: Int = 10 * BAND_SIZE
         const val INCOME_BAND: Int = 11 * BAND_SIZE
+        const val NOTIFICATION_BAND: Int = 12 * BAND_SIZE
     }
 }

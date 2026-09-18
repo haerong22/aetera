@@ -33,6 +33,9 @@ aetera:
     cookie-secure: false
   cors:
     allowed-origins: http://localhost:3000
+  notification:
+    # log = 메일 대신 로그로 찍는다. SMTP 자격증명이 준비되면 email 로 바꾼다.
+    sender: log
 
 server:
   shutdown: graceful
