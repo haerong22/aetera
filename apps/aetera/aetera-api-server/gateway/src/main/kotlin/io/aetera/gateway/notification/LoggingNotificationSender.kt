@@ -27,8 +27,8 @@ private val log = KotlinLogging.logger {}
 @Component
 @ConditionalOnProperty(name = ["aetera.notification.sender"], havingValue = "log", matchIfMissing = true)
 class LoggingNotificationSender : NotificationSender {
+    /** 메일 발송기와 **같은 글**을 찍는다. 다르면 여기서 본 것이 나갈 것과 달라져 볼 이유가 없다. */
     override fun send(digest: NoticeDigest) {
-        val lines = digest.notices.joinToString("\n") { "    ${it.on}  ${it.title}${it.detail?.let { d -> " ($d)" } ?: ""}" }
-        log.info { "[알림·미발송] ${digest.to} (${digest.nickname}) ${digest.on} · ${digest.notices.size}건\n$lines" }
+        log.info { "[알림·미발송] ${digest.to}\n제목: ${digest.subject}\n${digest.body}" }
     }
 }
