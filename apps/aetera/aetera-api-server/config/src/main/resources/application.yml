@@ -36,6 +36,9 @@ aetera:
   notification:
     # log = 메일 대신 로그로 찍는다. SMTP 자격증명이 준비되면 email 로 바꾼다.
     sender: log
+    # sender=log 에서는 쓰이지 않지만, 로컬에서 email 로 바꿔 볼 때 이것 때문에
+    # 또 한 번 못 뜨는 일이 없도록 둔다. 표시 이름을 붙이지 않는 이유는 prod 쪽에 적어 뒀다.
+    from: no-reply@aetera.local
 
 server:
   shutdown: graceful
@@ -44,6 +47,12 @@ server:
       enabled: false
 
 management:
+  health:
+    # 메일 서버가 잠깐 안 되면 앱 전체가 DOWN 으로 보고되고, 로드밸런서가 멀쩡한 서버를
+    # 빼 버린다. 알림은 곁가지라 못 나간다고 API 가 내려갈 이유가 없다 —
+    # 발송 실패는 로그로 남고 다음 시각에 다시 시도한다.
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:

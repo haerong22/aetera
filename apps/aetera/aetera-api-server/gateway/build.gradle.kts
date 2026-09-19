@@ -9,6 +9,9 @@ dependencies {
 
     implementation(libs.spring.boot.starter.data.jpa)
 
+    // 알림 메일. 기본 설정(sender=log)에서는 쓰이지 않고, email 로 바꿀 때만 붙는다.
+    implementation(libs.spring.boot.starter.mail)
+
     runtimeOnly(libs.postgresql)
     runtimeOnly(libs.spring.boot.starter.flyway)
     runtimeOnly(libs.flyway.postgresql)

@@ -13,12 +13,33 @@ spring:
       hibernate:
         format_sql: false
 
+  # 알림 메일. SMTP_* 를 채우지 않으면 **서버가 뜨지 않는다.**
+  # 일부러 그렇게 둔다 — 메일을 보내겠다고 해 놓고 못 보내는 상태로 도는 것보다,
+  # 배포하는 순간 아는 편이 낫다. 아직 준비가 안 됐으면 NOTIFICATION_SENDER=log 로 띄운다.
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+
 aetera:
   auth:
     jwt-secret: ${JWT_SECRET}
     cookie-secure: true
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:https://app.aetera.io}
+  notification:
+    sender: ${NOTIFICATION_SENDER:email}
+    # 주소만 둔다. "아이테라 <no-reply@…>" 처럼 표시 이름을 붙이려면 ASCII 가 아닌 글자를
+    # RFC 2047 로 인코딩해야 하는데, SimpleMailMessage 는 그걸 해 주지 않는다 —
+    # 인코딩 없이 나간 헤더는 받는 서버에 따라 깨지거나 거부된다.
+    from: ${NOTIFICATION_FROM:no-reply@aetera.io}
 
 management:
   endpoints:
