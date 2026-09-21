@@ -44,8 +44,6 @@ class Goal private constructor(
     var periodStart: LocalDate = periodStart
         private set
 
-    val isAchieved: Boolean get() = progress >= target
-
     fun update(
         title: String,
         period: GoalPeriod,
@@ -91,6 +89,17 @@ class Goal private constructor(
             progress = 0
         }
     }
+
+    /**
+     * [today] 가 속한 주기의 진행도. 주기가 넘어갔으면 아직 아무도 기록하지 않았어도 0 이다.
+     *
+     * [rollOverIfNeeded] 와 답은 같지만 **아무것도 바꾸지 않는다.** 쓰기 트랜잭션 안에서
+     * 저 메서드를 부르면 더티 체킹이 리셋을 그대로 저장해 버려, 읽기만 하려던 쪽이
+     * 조용히 쓰기를 일으킨다.
+     */
+    fun progressOn(today: LocalDate): Int = if (period.startOf(today).isAfter(periodStart)) 0 else progress
+
+    fun isAchievedOn(today: LocalDate): Boolean = progressOn(today) >= target
 
     override fun equals(other: Any?): Boolean = this === other || (other is Goal && id == other.id)
 

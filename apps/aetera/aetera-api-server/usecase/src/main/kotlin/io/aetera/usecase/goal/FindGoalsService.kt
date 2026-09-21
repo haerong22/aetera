@@ -18,12 +18,14 @@ class FindGoalsService(
      * 주기가 지난 목표는 0 부터 다시 보여준다. 저장하지는 않는다 —
      * 화면을 열어 두기만 해도 쓰기가 일어나면 읽기 전용 조회가 아니게 된다.
      * 실제 리셋은 다음 기록 시점에 남는다.
+     *
+     * 그 "저장하지 않음"을 트랜잭션 설정이 아니라 [GoalDto] 가 보장한다 — 예전에는
+     * `rollOverIfNeeded` 로 값을 바꿔 놓고 readOnly 가 플러시를 막아 주기를 기대했다.
      */
     fun findGoals(userId: UUID): List<GoalDto> {
         val today = clock.today()
         return goalRepository
             .findAllByUserId(UserId(userId))
-            .onEach { it.rollOverIfNeeded(today) }
-            .map(::GoalDto)
+            .map { GoalDto(it, today) }
     }
 }

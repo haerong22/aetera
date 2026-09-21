@@ -22,4 +22,15 @@ enum class GoalPeriod {
         WEEKLY -> date.with(WeekFields.ISO.dayOfWeek(), 1)
         MONTHLY -> date.withDayOfMonth(1)
     }
+
+    /**
+     * 이 날짜가 속한 주기의 **마지막 날**. 이 날이 지나면 진행도가 0 으로 돌아간다.
+     *
+     * 알림이 쓴다 — 목표는 만기와 달리 마감 뒤에 알리면 이미 늦다. 주가 넘어가면
+     * 그 주의 성적은 사라지고 재촉할 것도 남지 않는다.
+     */
+    fun endOf(date: LocalDate): LocalDate = when (this) {
+        WEEKLY -> startOf(date).plusDays(6)
+        MONTHLY -> date.withDayOfMonth(date.lengthOfMonth())
+    }
 }

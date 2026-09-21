@@ -64,7 +64,7 @@ class GoalTest :
                 target.addProgress(1, monday)
 
                 target.progress shouldBe 2
-                target.isAchieved shouldBe false
+                target.isAchievedOn(monday) shouldBe false
             }
 
             it("목표치에 닿으면 달성이다") {
@@ -72,7 +72,7 @@ class GoalTest :
 
                 target.addProgress(3, monday)
 
-                target.isAchieved shouldBe true
+                target.isAchievedOn(monday) shouldBe true
             }
 
             it("목표치를 넘겨도 막지 않는다 — 더 한 것을 못 했다고 할 수 없다") {
@@ -81,7 +81,7 @@ class GoalTest :
                 target.addProgress(5, monday)
 
                 target.progress shouldBe 5
-                target.isAchieved shouldBe true
+                target.isAchievedOn(monday) shouldBe true
             }
 
             it("음수로 되돌릴 수 있다") {
@@ -120,6 +120,40 @@ class GoalTest :
 
                 target.progress shouldBe 3
                 target.periodStart shouldBe monday
+            }
+        }
+
+        describe("주기의 끝") {
+            // 주는 월요일 시작. 2026-09-21 이 월요일이다.
+            it("주간은 그 주 일요일") {
+                GoalPeriod.WEEKLY.endOf(LocalDate.of(2026, 9, 21)) shouldBe LocalDate.of(2026, 9, 27)
+                GoalPeriod.WEEKLY.endOf(LocalDate.of(2026, 9, 27)) shouldBe LocalDate.of(2026, 9, 27)
+            }
+
+            it("월간은 그 달 말일 — 달마다 길이가 다르다") {
+                GoalPeriod.MONTHLY.endOf(LocalDate.of(2026, 9, 1)) shouldBe LocalDate.of(2026, 9, 30)
+                GoalPeriod.MONTHLY.endOf(LocalDate.of(2026, 2, 15)) shouldBe LocalDate.of(2026, 2, 28)
+            }
+        }
+
+        describe("저장 없이 보는 진행도") {
+            // 쓰기 트랜잭션 안에서 rollOverIfNeeded 를 부르면 더티 체킹이 리셋을 저장해 버린다.
+            it("주기가 넘어갔으면 0 으로 보이되 값은 그대로 남는다") {
+                val thisWeek = LocalDate.of(2026, 9, 14)
+                val nextWeek = LocalDate.of(2026, 9, 21)
+                val target = goal(today = thisWeek).apply { addProgress(3, thisWeek) }
+
+                target.progressOn(nextWeek) shouldBe 0
+                target.isAchievedOn(nextWeek) shouldBe false
+                // 묻기만 했으므로 저장된 값은 건드리지 않는다
+                target.progress shouldBe 3
+            }
+
+            it("같은 주기면 저장된 값 그대로") {
+                val start = LocalDate.of(2026, 9, 21)
+                val target = goal(today = start).apply { addProgress(2, start) }
+
+                target.progressOn(start.plusDays(3)) shouldBe 2
             }
         }
 

@@ -26,6 +26,6 @@ class AddGoalProgressService(
         val id = GoalId(goalId)
         val goal = goalRepository.getById(id).orNotFound(UserId(userId), GoalErrorCode.GOAL_NOT_FOUND, id)
         goal.addProgress(amount, clock.today())
-        return GoalDto(goalRepository.save(goal))
+        return GoalDto(goalRepository.save(goal), clock.today())
     }
 }

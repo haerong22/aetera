@@ -28,6 +28,6 @@ class CreateGoalService(
                 today = clock.today(),
                 createdAt = clock.instant(),
             )
-        return GoalDto(goalRepository.save(goal))
+        return GoalDto(goalRepository.save(goal), clock.today())
     }
 }

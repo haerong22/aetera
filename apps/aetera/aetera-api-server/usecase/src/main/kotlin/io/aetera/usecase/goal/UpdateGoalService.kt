@@ -31,6 +31,6 @@ class UpdateGoalService(
             unit = command.unit,
             today = clock.today(),
         )
-        return GoalDto(goalRepository.save(goal))
+        return GoalDto(goalRepository.save(goal), clock.today())
     }
 }
