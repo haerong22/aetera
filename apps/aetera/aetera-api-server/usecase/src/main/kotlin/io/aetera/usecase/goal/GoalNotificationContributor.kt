@@ -61,7 +61,9 @@ class GoalNotificationContributor(
             moduleId = GoalModule.MODULE_ID,
             on = endOfPeriod,
             title = goal.title,
-            detail = "${label(daysLeft)} · ${remaining}${goal.unit ?: "회"} 남았어요",
+            // 단위를 안 적었으면 지어내지 않는다 — "회"를 붙이면 "2권"이 맞는 목표에 "2회"가 나간다.
+            // 화면도 같은 자리를 비운다(`progressLabel`).
+            detail = "${label(daysLeft)} · ${remaining}${goal.unit ?: ""} 남았어요",
         )
     }
 

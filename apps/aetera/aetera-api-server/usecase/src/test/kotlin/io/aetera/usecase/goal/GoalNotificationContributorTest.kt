@@ -78,9 +78,16 @@ class GoalNotificationContributorTest :
 
         describe("남은 양") {
             it("목표에서 진행도를 뺀 만큼") {
-                goals(goal(target = 3, progress = 1))
+                goals(goal(target = 3, progress = 1, unit = "회"))
 
                 sut.noticesFor(owner, sunday).first().detail shouldContain "2회 남았어요"
+            }
+
+            // 안 적은 단위를 서버가 지어내면 "2권"이 맞는 목표에 "2회"가 나간다.
+            it("단위를 안 적었으면 숫자만") {
+                goals(goal(target = 3, progress = 1, unit = null))
+
+                sut.noticesFor(owner, sunday).first().detail shouldContain "2 남았어요"
             }
 
             it("단위를 정했으면 그 단위로") {
@@ -116,7 +123,7 @@ class GoalNotificationContributorTest :
                 val notices = sut.noticesFor(owner, sunday)
 
                 notices shouldHaveSize 1
-                notices.first().detail shouldContain "3회 남았어요"
+                notices.first().detail shouldContain "3 남았어요"
             }
         }
 
