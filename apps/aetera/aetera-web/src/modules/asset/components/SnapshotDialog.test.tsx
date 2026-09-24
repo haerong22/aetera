@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "@/test/render";
 import { jsonResponse } from "@/test/http";
+import { lastBody, stubFetch } from "@/test/stubFetch";
 import { SnapshotDialog } from "./SnapshotDialog";
 import type { AssetBoard, AssetEntry } from "../api";
 
@@ -18,23 +19,10 @@ const entry = (name: string, amount: number): AssetEntry => ({
   signedAmount: amount,
 });
 
-/** 저장 요청이 실어 보낸 것. 화면이 무엇을 보냈는지 보려면 이게 필요하다. */
-let sent: unknown;
-
 /** 저장·삭제가 돌려주는 화면 전체. 다이얼로그는 읽지 않지만 진짜와 같은 모양이어야 한다. */
 const emptyBoard: AssetBoard = { entries: [], netWorth: 0, cashTotal: 0, history: [] };
 
-beforeEach(() => {
-  sent = undefined;
-  vi.spyOn(globalThis, "fetch").mockImplementation(async (_url, init) => {
-    if (init?.body) sent = JSON.parse(String(init.body));
-    return jsonResponse(emptyBoard);
-  });
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
+const http = stubFetch(() => jsonResponse(emptyBoard));
 
 function open(entries: AssetEntry[] = [], existing = false) {
   const onClose = vi.fn();
@@ -101,8 +89,8 @@ describe("저장", () => {
     await user.clear(nameInputs()[1]);
     await user.click(screen.getByRole("button", { name: "저장" }));
 
-    await waitFor(() => expect(sent).toBeDefined());
-    expect(sent).toEqual({ entries: [{ name: "통장", category: "CASH", amount: 1000 }] });
+    await waitFor(() => expect(lastBody(http)).toBeDefined());
+    expect(lastBody(http)).toEqual({ entries: [{ name: "통장", category: "CASH", amount: 1000 }] });
   });
 
   it("이름 앞뒤 공백은 턴다", async () => {
@@ -110,8 +98,8 @@ describe("저장", () => {
 
     await user.click(screen.getByRole("button", { name: "저장" }));
 
-    await waitFor(() => expect(sent).toBeDefined());
-    expect((sent as { entries: { name: string }[] }).entries[0].name).toBe("통장");
+    await waitFor(() => expect(lastBody(http)).toBeDefined());
+    expect((lastBody(http) as { entries: { name: string }[] }).entries[0].name).toBe("통장");
   });
 
   it("모든 줄의 이름이 비면 저장할 수 없다", async () => {

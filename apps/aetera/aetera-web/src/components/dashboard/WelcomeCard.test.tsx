@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "@/test/render";
 import { errorResponse, jsonResponse } from "@/test/http";
+import { stubFetch } from "@/test/stubFetch";
 import { WelcomeCard } from "./WelcomeCard";
 import type { ModuleSummary } from "@/lib/types";
 
@@ -24,6 +25,18 @@ const module = (id: string, displayName: string, enabled = false): ModuleSummary
 /** 서버가 주는 모듈 목록. 시험마다 바꿔 끼운다. */
 let modules: ModuleSummary[] = [];
 
+stubFetch(({ url, method }) => {
+  // 켜기 요청이면 그 모듈을 켠 채로 돌려준다 — 실제 서버와 같은 모양이다.
+  const enabling = url.match(/modules\/([^/]+)\/enablement/);
+  if (enabling && method === "POST") {
+    const target = modules.find((it) => it.id === enabling[1]);
+    // 없는 모듈이면 서버도 404 를 준다. 단언으로 터뜨리면 원인이 흐려진다.
+    if (!target) return errorResponse(404, 4040301, "존재하지 않는 모듈입니다.");
+    return jsonResponse({ ...target, enabled: true });
+  }
+  return jsonResponse(modules);
+});
+
 beforeEach(() => {
   modules = [
     module("schedule", "일정"),
@@ -32,21 +45,6 @@ beforeEach(() => {
     module("goal", "목표"),
   ];
 
-  vi.spyOn(globalThis, "fetch").mockImplementation(async (url, init) => {
-    // 켜기 요청이면 그 모듈을 켠 목록을 돌려준다 — 실제 서버와 같은 모양이다.
-    const enabling = String(url).match(/modules\/([^/]+)\/enablement/);
-    if (enabling && init?.method === "POST") {
-      const target = modules.find((it) => it.id === enabling[1]);
-      // 없는 모듈이면 서버도 404 를 준다. 단언으로 터뜨리면 원인이 흐려진다.
-      if (!target) return errorResponse(404, 4040301, "존재하지 않는 모듈입니다.");
-      return jsonResponse({ ...target, enabled: true });
-    }
-    return jsonResponse(modules);
-  });
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
 });
 
 /** 목록에 보이는 "켜기" 버튼들. */
