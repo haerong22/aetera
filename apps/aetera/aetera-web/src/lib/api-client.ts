@@ -146,7 +146,28 @@ function endSession() {
   sessionExpiredHandler?.();
 }
 
+/**
+ * 응답을 **그대로** 돌려준다. 인증과 재발급은 [apiFetch] 와 똑같이 한다.
+ *
+ * 내려받기처럼 본문이 아니라 파일 자체가 필요한 곳이 쓴다 — JSON 으로 파싱했다가 다시
+ * 문자열로 만들면 서버가 정한 파일 이름(헤더)도, 줄 모양도 잃는다.
+ */
+export async function apiFetchRaw(path: string, init: RequestInit = {}): Promise<Response> {
+  const response = await authorizedFetch(path, init);
+  if (!response.ok) throw await parseError(response);
+  return response;
+}
+
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await authorizedFetch(path, init);
+
+  if (!response.ok) throw await parseError(response);
+  if (response.status === 204) return undefined as T;
+  return (await response.json()) as T;
+}
+
+/** 401 이면 한 번 재발급하고 다시 시도한다. 성공 여부는 부르는 쪽이 본다. */
+async function authorizedFetch(path: string, init: RequestInit): Promise<Response> {
   let response = await rawFetch(path, init);
 
   if (response.status === 401 && !path.startsWith("/api/v1/auth/")) {
@@ -160,7 +181,5 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     response = await rawFetch(path, init);
   }
 
-  if (!response.ok) throw await parseError(response);
-  if (response.status === 204) return undefined as T;
-  return (await response.json()) as T;
+  return response;
 }
