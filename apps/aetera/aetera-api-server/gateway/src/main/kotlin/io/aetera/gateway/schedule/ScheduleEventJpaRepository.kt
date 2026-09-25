@@ -7,6 +7,9 @@ import java.time.Instant
 import java.util.UUID
 
 interface ScheduleEventJpaRepository : JpaRepository<ScheduleEventJpaEntity, UUID> {
+    /** 내보내기가 쓴다. 기간이 없으므로 인덱스의 선두 컬럼만 타고 훑는다. */
+    fun findAllByUserIdOrderByStartsAtAsc(userId: UUID): List<ScheduleEventJpaEntity>
+
     /**
      * 기간과 겹치는 일정: `starts_at <= :to AND ends_at >= :from` (양 끝 포함).
      * 인덱스 `(user_id, starts_at)` 를 타고, 시작 시각이 같은 일정은 id 로 순서를 고정한다

@@ -22,6 +22,10 @@ class ScheduleEventRepositoryJpaAdapter(
 
     override fun getById(id: ScheduleEventId): ScheduleEvent? = scheduleEventJpaRepository.findByIdOrNull(id.value)?.toModel()
 
+    override fun findAllByUserId(userId: UserId): List<ScheduleEvent> = scheduleEventJpaRepository
+        .findAllByUserIdOrderByStartsAtAsc(userId.value)
+        .map { it.toModel() }
+
     override fun findAllOverlapping(
         userId: UserId,
         period: SchedulePeriod,

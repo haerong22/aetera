@@ -17,7 +17,8 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
  */
 private val MODULE_PACKAGES = listOf("schedule", "guide", "renewal", "goal", "expense", "asset", "timeline", "income")
 
-// 알림은 모듈이 아니라 코어 기능이다 — 모듈들이 여기로 모여 나가므로 격리 규칙의 대상이 아니다.
+// notification 과 export 는 이 목록에 없다. 모듈이 아니라 **모듈들이 모여드는 코어 기능**이라
+// 격리 규칙의 대상이 아니다 — 목록에 넣으면 기여자를 가진 모듈 전부와 "서로 참조 금지"가 걸린다.
 
 @AnalyzeClasses(
     packages = ["io.aetera"],
