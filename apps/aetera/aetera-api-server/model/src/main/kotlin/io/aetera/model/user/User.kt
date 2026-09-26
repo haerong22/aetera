@@ -17,7 +17,6 @@ class User private constructor(
     timezone: ZoneId,
     status: UserStatus,
     val registeredAt: Instant,
-    withdrawnAt: Instant?,
 ) {
     var email: Email = email
         private set
@@ -31,9 +30,13 @@ class User private constructor(
     var status: UserStatus = status
         private set
 
-    var withdrawnAt: Instant? = withdrawnAt
-        private set
-
+    /**
+     * 지금 쓸 수 있는 계정인가. 로그인·토큰 재발급·알림 발송이 이 값을 본다.
+     *
+     * 탈퇴는 상태를 바꾸지 않고 **행을 지운다**([UserRepository.delete]) — 남겨 두면
+     * 이메일 유니크 인덱스가 그 주소를 묶는다. 그래서 지금 이 값은 언제나 true 이지만,
+     * 정지(suspend) 같은 상태가 생기면 그 자리가 여기다.
+     */
     val isActive: Boolean get() = status == UserStatus.ACTIVE
 
     fun changeNickname(newNickname: String) {
@@ -41,16 +44,10 @@ class User private constructor(
         nickname = validateNickname(newNickname)
     }
 
-    fun withdraw(at: Instant) {
-        ensure(!status.isTerminated, UserErrorCode.USER_ALREADY_WITHDRAWN)
-        status = UserStatus.WITHDRAWN
-        withdrawnAt = at
-    }
-
     private fun requireActive() {
         ensure(
             isActive,
-            UserErrorCode.USER_ALREADY_WITHDRAWN,
+            UserErrorCode.USER_NOT_ACTIVE,
             "활성 상태의 사용자만 처리할 수 있습니다. 현재 상태: $status",
         )
     }
@@ -79,7 +76,6 @@ class User private constructor(
             timezone = timezone,
             status = UserStatus.ACTIVE,
             registeredAt = registeredAt,
-            withdrawnAt = null,
         )
 
         fun reconstitute(
@@ -89,8 +85,7 @@ class User private constructor(
             timezone: ZoneId,
             status: UserStatus,
             registeredAt: Instant,
-            withdrawnAt: Instant?,
-        ): User = User(id, email, nickname, timezone, status, registeredAt, withdrawnAt)
+        ): User = User(id, email, nickname, timezone, status, registeredAt)
 
         fun parseTimezone(value: String): ZoneId = runCatching { ZoneId.of(value) }.getOrElse {
             throw CoreException(UserErrorCode.INVALID_TIMEZONE, "'$value'는 올바른 타임존이 아닙니다.")

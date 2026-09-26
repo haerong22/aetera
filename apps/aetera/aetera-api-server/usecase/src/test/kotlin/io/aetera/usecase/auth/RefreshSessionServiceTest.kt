@@ -55,7 +55,6 @@ class RefreshSessionServiceTest :
                 timezone = User.DEFAULT_TIMEZONE,
                 status = UserStatus.ACTIVE,
                 registeredAt = now.minusSeconds(86_400),
-                withdrawnAt = null,
             )
 
         val raw = OpaqueToken.generate()

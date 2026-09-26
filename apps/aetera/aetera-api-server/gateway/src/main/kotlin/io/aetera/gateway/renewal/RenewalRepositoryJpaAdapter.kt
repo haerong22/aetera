@@ -37,4 +37,8 @@ class RenewalRepositoryJpaAdapter(
     override fun delete(renewal: Renewal) {
         renewalJpaRepository.deleteById(renewal.id.value)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        renewalJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

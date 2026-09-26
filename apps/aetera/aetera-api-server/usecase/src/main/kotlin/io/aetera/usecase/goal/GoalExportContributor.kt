@@ -1,7 +1,7 @@
 package io.aetera.usecase.goal
 
 import io.aetera.model.goal.GoalRepository
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.UserId
 import org.springframework.stereotype.Component
 
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 class GoalExportContributor(
     private val goalRepository: GoalRepository,
-) : ExportContributor {
+) : UserDataContributor {
     override val section: String = GoalModule.MODULE_ID.value
 
     override fun exportFor(userId: UserId): List<Map<String, Any?>> = goalRepository
@@ -28,4 +28,8 @@ class GoalExportContributor(
                 "createdAt" to goal.createdAt.toString(),
             )
         }
+
+    override fun deleteAllFor(userId: UserId) {
+        goalRepository.deleteAllByUserId(userId)
+    }
 }

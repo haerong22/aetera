@@ -3,7 +3,7 @@ package io.aetera.usecase.guide
 import io.aetera.model.guide.GuideJourney
 import io.aetera.model.guide.GuideJourneyRepository
 import io.aetera.model.guide.GuideTaskProgressRepository
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.UserId
 import org.springframework.stereotype.Component
 
@@ -21,7 +21,7 @@ class GuideExportContributor(
     private val guideJourneyRepository: GuideJourneyRepository,
     private val guideTaskProgressRepository: GuideTaskProgressRepository,
     private val guideCatalog: GuideCatalog,
-) : ExportContributor {
+) : UserDataContributor {
     override val section: String = "guide"
 
     override fun exportFor(userId: UserId): List<Map<String, Any?>> = guideJourneyRepository
@@ -58,5 +58,17 @@ class GuideExportContributor(
             "startedAt" to journey.startedAt.toString(),
             "doneTasks" to done,
         )
+    }
+
+    /**
+     * 여정과 그에 딸린 할 일 진행을 함께 지운다.
+     *
+     * 진행은 `journey_id` 로만 묶여 있어 `user_id` 로 지울 수 없다 — 여정을 먼저 지우면
+     * 진행이 **가리킬 곳 없는 행으로 남는다.** 그래서 순서가 정해져 있다.
+     */
+    override fun deleteAllFor(userId: UserId) {
+        val journeys = guideJourneyRepository.findAllByUserId(userId)
+        journeys.forEach { guideTaskProgressRepository.deleteAllByJourneyId(it.id) }
+        guideJourneyRepository.deleteAllByUserId(userId)
     }
 }

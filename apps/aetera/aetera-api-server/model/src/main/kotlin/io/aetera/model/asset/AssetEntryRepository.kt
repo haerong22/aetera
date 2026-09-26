@@ -21,6 +21,9 @@ interface AssetEntryRepository {
         to: LocalDate,
     ): List<AssetEntry>
 
+    /** 탈퇴할 때 한 번. 이 사용자의 것을 통째로 지운다. */
+    fun deleteAllByUserId(userId: UserId)
+
     /** 한 달을 통째로 갈아 끼우기 전에 비운다. 스냅샷은 부분 수정이 아니라 교체다. */
     fun deleteByUserIdAndMonth(
         userId: UserId,

@@ -62,30 +62,4 @@ class UserTest :
                     .errorCode shouldBe UserErrorCode.INVALID_TIMEZONE
             }
         }
-
-        describe("withdraw") {
-            it("탈퇴 시각을 기록하고 종료 상태가 된다") {
-                val sut = user()
-
-                sut.withdraw(now)
-
-                sut.status shouldBe UserStatus.WITHDRAWN
-                sut.withdrawnAt shouldBe now
-            }
-
-            it("두 번 탈퇴할 수 없다") {
-                val sut = user()
-                sut.withdraw(now)
-
-                shouldThrow<CoreException> { sut.withdraw(now) }
-                    .errorCode shouldBe UserErrorCode.USER_ALREADY_WITHDRAWN
-            }
-
-            it("탈퇴 후에는 닉네임을 바꿀 수 없다") {
-                val sut = user()
-                sut.withdraw(now)
-
-                shouldThrow<CoreException> { sut.changeNickname("새이름") }
-            }
-        }
     })

@@ -1,5 +1,6 @@
 package io.aetera.controller.me
 
+import io.aetera.controller.auth.RefreshTokenCookie
 import io.aetera.controller.common.CurrentUserId
 import io.aetera.usecase.module.DisableModuleService
 import io.aetera.usecase.module.EnableModuleService
@@ -8,8 +9,12 @@ import io.aetera.usecase.module.ModuleSummaryDto
 import io.aetera.usecase.module.ReorderModulesService
 import io.aetera.usecase.user.GetMyProfileService
 import io.aetera.usecase.user.UserDto
+import io.aetera.usecase.user.WithdrawService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,6 +30,8 @@ import java.util.UUID
 @Tag(name = "Me")
 class MeController(
     private val getMyProfileService: GetMyProfileService,
+    private val withdrawService: WithdrawService,
+    @param:Value("\${aetera.auth.cookie-secure}") private val cookieSecure: Boolean,
     private val findMyModulesService: FindMyModulesService,
     private val enableModuleService: EnableModuleService,
     private val disableModuleService: DisableModuleService,
@@ -62,4 +69,22 @@ class MeController(
         @CurrentUserId userId: UUID,
         @PathVariable("module-id") moduleId: String,
     ): ModuleSummaryDto = disableModuleService.disable(userId, moduleId)
+
+    /**
+     * 탈퇴. **되돌릴 수 없다.**
+     *
+     * 리프레시 쿠키도 함께 지운다 — 안 지우면 브라우저가 죽은 계정의 토큰을 들고 다니며
+     * 재발급을 시도한다.
+     */
+    @DeleteMapping
+    @Operation(summary = "탈퇴. 모든 데이터를 되돌릴 수 없이 지운다.")
+    fun withdraw(
+        @CurrentUserId userId: UUID,
+    ): ResponseEntity<Void> {
+        withdrawService.withdraw(userId)
+        return ResponseEntity
+            .noContent()
+            .header(HttpHeaders.SET_COOKIE, RefreshTokenCookie.expire(cookieSecure).toString())
+            .build()
+    }
 }

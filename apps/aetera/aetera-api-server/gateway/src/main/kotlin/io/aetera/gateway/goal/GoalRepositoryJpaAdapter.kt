@@ -28,4 +28,8 @@ class GoalRepositoryJpaAdapter(
     override fun delete(goal: Goal) {
         goalJpaRepository.deleteById(goal.id.value)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        goalJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

@@ -39,4 +39,8 @@ class ScheduleEventRepositoryJpaAdapter(
     override fun delete(event: ScheduleEvent) {
         scheduleEventJpaRepository.deleteById(event.id.value)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        scheduleEventJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

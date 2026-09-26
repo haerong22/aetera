@@ -33,4 +33,8 @@ class RefreshTokenRepositoryJpaAdapter(
     ) {
         refreshTokenJpaRepository.revokeAllByUserId(userId.value, at, RefreshTokenRevocation.REVOKED)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        refreshTokenJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

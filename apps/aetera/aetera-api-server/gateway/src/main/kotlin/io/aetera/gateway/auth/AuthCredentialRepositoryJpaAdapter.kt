@@ -22,4 +22,8 @@ class AuthCredentialRepositoryJpaAdapter(
         userId: UserId,
         provider: AuthProvider,
     ): AuthCredential? = authCredentialJpaRepository.findByUserIdAndProvider(userId.value, provider)?.toModel()
+
+    override fun deleteAllByUserId(userId: UserId) {
+        authCredentialJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

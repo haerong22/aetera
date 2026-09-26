@@ -28,4 +28,8 @@ class IncomeSourceRepositoryJpaAdapter(
     override fun delete(source: IncomeSource) {
         incomeSourceJpaRepository.deleteById(source.id.value)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        incomeSourceJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

@@ -1,14 +1,14 @@
 package io.aetera.usecase.expense
 
 import io.aetera.model.expense.FixedExpenseRepository
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.UserId
 import org.springframework.stereotype.Component
 
 @Component
 class ExpenseExportContributor(
     private val fixedExpenseRepository: FixedExpenseRepository,
-) : ExportContributor {
+) : UserDataContributor {
     override val section: String = ExpenseModule.MODULE_ID.value
 
     override fun exportFor(userId: UserId): List<Map<String, Any?>> = fixedExpenseRepository
@@ -24,4 +24,8 @@ class ExpenseExportContributor(
                 "createdAt" to expense.createdAt.toString(),
             )
         }
+
+    override fun deleteAllFor(userId: UserId) {
+        fixedExpenseRepository.deleteAllByUserId(userId)
+    }
 }

@@ -1,14 +1,14 @@
 package io.aetera.usecase.income
 
 import io.aetera.model.income.IncomeSourceRepository
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.UserId
 import org.springframework.stereotype.Component
 
 @Component
 class IncomeExportContributor(
     private val incomeSourceRepository: IncomeSourceRepository,
-) : ExportContributor {
+) : UserDataContributor {
     override val section: String = IncomeModule.MODULE_ID.value
 
     override fun exportFor(userId: UserId): List<Map<String, Any?>> = incomeSourceRepository
@@ -26,4 +26,8 @@ class IncomeExportContributor(
                 "createdAt" to source.createdAt.toString(),
             )
         }
+
+    override fun deleteAllFor(userId: UserId) {
+        incomeSourceRepository.deleteAllByUserId(userId)
+    }
 }

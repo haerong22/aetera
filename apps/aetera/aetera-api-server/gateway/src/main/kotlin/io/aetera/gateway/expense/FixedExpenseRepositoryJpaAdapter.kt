@@ -28,4 +28,8 @@ class FixedExpenseRepositoryJpaAdapter(
     override fun delete(expense: FixedExpense) {
         fixedExpenseJpaRepository.deleteById(expense.id.value)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        fixedExpenseJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

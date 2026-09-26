@@ -1,7 +1,7 @@
 package io.aetera.usecase.asset
 
 import io.aetera.model.asset.AssetEntryRepository
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.UserId
 import org.springframework.stereotype.Component
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class AssetExportContributor(
     private val assetEntryRepository: AssetEntryRepository,
-) : ExportContributor {
+) : UserDataContributor {
     override val section: String = AssetModule.MODULE_ID.value
 
     override fun exportFor(userId: UserId): List<Map<String, Any?>> = assetEntryRepository
@@ -24,4 +24,8 @@ class AssetExportContributor(
                 "recordedAt" to entry.recordedAt.toString(),
             )
         }
+
+    override fun deleteAllFor(userId: UserId) {
+        assetEntryRepository.deleteAllByUserId(userId)
+    }
 }

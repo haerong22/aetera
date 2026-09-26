@@ -25,7 +25,7 @@ interface GuideTaskProgressJpaRepository : JpaRepository<GuideTaskProgressJpaEnt
      * 여정 초기화용 일괄 삭제. 영속성 컨텍스트에 남은 사본이 이어서 flush 되면 지운 행이
      * 되살아나므로 [Modifying.clearAutomatically] 로 비운다.
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from GuideTaskProgressJpaEntity p where p.journeyId = :journeyId")
     fun deleteAllByJourneyId(
         @Param("journeyId") journeyId: UUID,

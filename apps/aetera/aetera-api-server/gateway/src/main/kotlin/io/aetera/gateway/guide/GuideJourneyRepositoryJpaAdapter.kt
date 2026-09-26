@@ -29,4 +29,8 @@ class GuideJourneyRepositoryJpaAdapter(
     override fun delete(journey: GuideJourney) {
         guideJourneyJpaRepository.deleteById(journey.id.value)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        guideJourneyJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

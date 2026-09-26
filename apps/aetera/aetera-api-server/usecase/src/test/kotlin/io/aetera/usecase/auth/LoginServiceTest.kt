@@ -49,7 +49,6 @@ class LoginServiceTest :
             timezone = User.DEFAULT_TIMEZONE,
             status = status,
             registeredAt = now.minusSeconds(86_400),
-            withdrawnAt = null,
         )
 
         fun credential(userId: UserId) = AuthCredential.email(AuthCredentialId.next(), userId, hash, now)
@@ -88,8 +87,13 @@ class LoginServiceTest :
             shouldThrow<CoreException> { sut.login(command) }.errorCode shouldBe AuthErrorCode.LOGIN_FAILED
         }
 
-        it("탈퇴한 사용자는 로그인할 수 없다") {
-            every { userRepository.getByEmail(Email("hong@example.com")) } returns user(UserStatus.WITHDRAWN)
+        /*
+         * 탈퇴는 행을 지우므로 "탈퇴한 사용자" 는 곧 "없는 사용자" 다 — 위의 시험이 그 경우를 덮는다.
+         * 여기서는 쓸 수 없는 계정이면 토큰을 내주지 않는다는 것만 못 박는다. 지금 상태는
+         * ACTIVE 하나뿐이라 도달할 수 없지만, 정지 같은 상태가 생기면 이 자리가 살아난다.
+         */
+        it("쓸 수 없는 계정에는 토큰을 내주지 않는다") {
+            every { userRepository.getByEmail(Email("hong@example.com")) } returns null
 
             shouldThrow<CoreException> { sut.login(command) }.errorCode shouldBe AuthErrorCode.LOGIN_FAILED
             verify(exactly = 0) { refreshTokenRepository.save(any()) }

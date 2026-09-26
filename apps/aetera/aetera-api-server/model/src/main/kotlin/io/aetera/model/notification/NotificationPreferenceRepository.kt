@@ -5,6 +5,9 @@ import io.aetera.model.user.UserId
 interface NotificationPreferenceRepository {
     fun save(preference: NotificationPreference): NotificationPreference
 
+    /** 탈퇴할 때 한 번. 이 사용자의 것을 통째로 지운다. */
+    fun deleteAllByUserId(userId: UserId)
+
     fun findByUserId(userId: UserId): NotificationPreference?
 
     /**

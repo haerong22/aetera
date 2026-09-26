@@ -1,6 +1,6 @@
 package io.aetera.usecase.export
 
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.Email
 import io.aetera.model.user.User
 import io.aetera.model.user.UserErrorCode
@@ -37,7 +37,6 @@ class ExportMyDataServiceTest :
                 timezone = ZoneOffset.UTC,
                 status = io.aetera.model.user.UserStatus.ACTIVE,
                 registeredAt = Instant.parse("2026-01-01T00:00:00Z"),
-                withdrawnAt = null,
             )
 
         val userRepository = mockk<UserRepository>()
@@ -46,13 +45,15 @@ class ExportMyDataServiceTest :
         fun contributor(
             section: String,
             vararg rows: Map<String, Any?>,
-        ) = object : ExportContributor {
+        ) = object : UserDataContributor {
             override val section = section
 
             override fun exportFor(userId: UserId) = rows.toList()
+
+            override fun deleteAllFor(userId: UserId) = Unit
         }
 
-        fun service(vararg contributors: ExportContributor) = ExportMyDataService(contributors.toList(), userRepository, clock)
+        fun service(vararg contributors: UserDataContributor) = ExportMyDataService(contributors.toList(), userRepository, clock)
 
         beforeEach {
             every { userRepository.getById(owner) } returns user
@@ -106,7 +107,7 @@ class ExportMyDataServiceTest :
             }
 
             /*
-             * 이 기능의 핵심 약속. 타임라인·알림 기여자와 달리 ExportContributor 에는
+             * 이 기능의 핵심 약속. 타임라인·알림 기여자와 달리 UserDataContributor 에는
              * moduleIds 가 없어 켜짐을 묻지 않는다 — 여기가 그 사실을 지킨다.
              */
             it("켜짐을 묻지 않는다 — 꺼진 모듈의 데이터도 함께 나온다") {

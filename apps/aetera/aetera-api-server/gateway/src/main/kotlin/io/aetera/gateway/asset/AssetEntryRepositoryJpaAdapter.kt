@@ -36,4 +36,8 @@ class AssetEntryRepositoryJpaAdapter(
     ) {
         assetEntryJpaRepository.deleteByUserIdAndMonth(userId.value, month)
     }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        assetEntryJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

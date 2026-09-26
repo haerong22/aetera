@@ -35,4 +35,8 @@ class ModuleEnrollmentRepositoryJpaAdapter(
         moduleId.value,
         EnrollmentStatus.ENABLED,
     )
+
+    override fun deleteAllByUserId(userId: UserId) {
+        moduleEnrollmentJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

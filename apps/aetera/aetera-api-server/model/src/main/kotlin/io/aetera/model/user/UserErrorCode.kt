@@ -15,5 +15,5 @@ enum class UserErrorCode(
     USER_NOT_FOUND(ErrorKind.NOT_FOUND, ErrorCode.USER_BAND + 1, "사용자를 찾을 수 없습니다."),
 
     EMAIL_ALREADY_REGISTERED(ErrorKind.CONFLICT, ErrorCode.USER_BAND + 1, "이미 가입된 이메일입니다."),
-    USER_ALREADY_WITHDRAWN(ErrorKind.CONFLICT, ErrorCode.USER_BAND + 2, "이미 탈퇴한 사용자입니다."),
+    USER_NOT_ACTIVE(ErrorKind.CONFLICT, ErrorCode.USER_BAND + 2, "지금 쓸 수 없는 계정입니다."),
 }

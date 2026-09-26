@@ -1,6 +1,6 @@
 package io.aetera.usecase.export
 
-import io.aetera.model.module.ExportContributor
+import io.aetera.model.module.UserDataContributor
 import io.aetera.model.user.UserErrorCode
 import io.aetera.model.user.UserId
 import io.aetera.model.user.UserRepository
@@ -16,7 +16,7 @@ import java.util.UUID
  * **떠날 자유가 없으면 들어오기도 망설인다.** 돈 이야기를 몇 달 적어 두고 꺼낼 길이 없으면
  * 그건 사용자의 기록이 아니라 우리 것이 된다.
  *
- * 어떤 모듈이 있는지 모른다 — 스프링이 [ExportContributor] 빈을 전부 넣어 주므로
+ * 어떤 모듈이 있는지 모른다 — 스프링이 [UserDataContributor] 빈을 전부 넣어 주므로
  * 새 모듈이 생겨도 여기는 바뀌지 않는다(타임라인·알림과 같은 방식).
  *
  * 꺼진 모듈도 함께 낸다. 모듈 스토어가 "중지해도 데이터는 남는다"고 약속하므로,
@@ -25,7 +25,7 @@ import java.util.UUID
 @Service
 @Transactional(readOnly = true)
 class ExportMyDataService(
-    private val contributors: List<ExportContributor>,
+    private val contributors: List<UserDataContributor>,
     private val userRepository: UserRepository,
     private val clock: Clock,
 ) {

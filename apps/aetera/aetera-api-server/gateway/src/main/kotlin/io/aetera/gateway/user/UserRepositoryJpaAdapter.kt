@@ -24,4 +24,8 @@ class UserRepositoryJpaAdapter(
     override fun getByEmail(email: Email): User? = userJpaRepository.findByEmail(email.value)?.toModel()
 
     override fun existsByEmail(email: Email): Boolean = userJpaRepository.existsByEmail(email.value)
+
+    override fun delete(user: User) {
+        userJpaRepository.deleteById(user.id.value)
+    }
 }

@@ -20,5 +20,8 @@ interface ScheduleEventRepository {
         period: SchedulePeriod,
     ): List<ScheduleEvent>
 
+    /** 탈퇴할 때 한 번. 이 사용자의 것을 통째로 지운다. */
+    fun deleteAllByUserId(userId: UserId)
+
     fun delete(event: ScheduleEvent)
 }

@@ -24,4 +24,8 @@ class NotificationPreferenceRepositoryJpaAdapter(
     override fun findAllEnabled(): List<NotificationPreference> = notificationPreferenceJpaRepository
         .findAllByEnabledIsTrue()
         .map { it.toModel() }
+
+    override fun deleteAllByUserId(userId: UserId) {
+        notificationPreferenceJpaRepository.deleteAllByUserId(userId.value)
+    }
 }

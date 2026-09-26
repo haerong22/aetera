@@ -6,6 +6,9 @@ import java.time.Instant
 interface RefreshTokenRepository {
     fun save(token: RefreshToken): RefreshToken
 
+    /** 탈퇴할 때 한 번. 이 사용자의 것을 통째로 지운다. */
+    fun deleteAllByUserId(userId: UserId)
+
     fun getByTokenHash(tokenHash: String): RefreshToken?
 
     /**

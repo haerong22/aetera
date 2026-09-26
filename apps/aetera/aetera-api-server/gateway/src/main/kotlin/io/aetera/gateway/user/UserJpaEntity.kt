@@ -29,15 +29,12 @@ class UserJpaEntity(
     var status: UserStatus,
     @Column(name = "registered_at", nullable = false, updatable = false)
     val registeredAt: Instant,
-    @Column(name = "withdrawn_at")
-    var withdrawnAt: Instant?,
 ) : UuidJpaEntity(uid) {
     fun applyFrom(user: User) {
         email = user.email.value
         nickname = user.nickname
         timezone = user.timezone.id
         status = user.status
-        withdrawnAt = user.withdrawnAt
     }
 
     fun toModel(): User = User.reconstitute(
@@ -47,7 +44,6 @@ class UserJpaEntity(
         timezone = ZoneId.of(timezone),
         status = status,
         registeredAt = registeredAt,
-        withdrawnAt = withdrawnAt,
     )
 
     companion object {
@@ -58,7 +54,6 @@ class UserJpaEntity(
             timezone = user.timezone.id,
             status = user.status,
             registeredAt = user.registeredAt,
-            withdrawnAt = user.withdrawnAt,
         )
     }
 }

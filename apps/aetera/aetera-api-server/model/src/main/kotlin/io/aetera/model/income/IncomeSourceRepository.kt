@@ -10,5 +10,8 @@ interface IncomeSourceRepository {
     /** 순서는 정하지 않는다 — 화면에 보이는 순서(큰 것부터)가 파생값이라 유스케이스가 어차피 다시 정렬한다. */
     fun findAllByUserId(userId: UserId): List<IncomeSource>
 
+    /** 탈퇴할 때 한 번. 이 사용자의 것을 통째로 지운다. */
+    fun deleteAllByUserId(userId: UserId)
+
     fun delete(source: IncomeSource)
 }
