@@ -9,6 +9,7 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { NotificationSection } from "@/components/settings/NotificationSection";
 import { ExportSection } from "@/components/settings/ExportSection";
+import { WithdrawSection } from "@/components/settings/WithdrawSection";
 import { cn } from "@/components/ui/cn";
 import { sortByIdOrder } from "@/lib/order";
 import { moduleIcon } from "@/modules/registry";
@@ -175,6 +176,8 @@ export default function SettingsPage() {
       <NotificationSection />
 
       <ExportSection />
+
+      <WithdrawSection />
 
       <section className="flex flex-col gap-3">
         <div>
