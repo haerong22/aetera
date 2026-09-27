@@ -24,6 +24,23 @@ export function WithdrawSection() {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  /**
+   * 닫을 때 적어 둔 것을 비운다.
+   *
+   * 남겨 두면 다시 열었을 때 칸이 채워진 채라 **단추가 이미 열려 있다** — 확인 문구가
+   * 첫 번째 열기에만 일하고, 그 뒤로는 한 번 누르면 지워진다. 마음을 바꿔 취소한 사람이
+   * 나중에 잘못 누르는 것이 바로 이 문구가 막으려던 것이다.
+   *
+   * 보내는 중에는 닫지 않는다. 취소 단추는 이미 잠겨 있는데 바깥을 눌러 닫히면,
+   * 요청은 그대로 날아가 있는데 실패 안내를 받을 화면이 사라진다.
+   */
+  function close() {
+    if (busy) return;
+    setOpen(false);
+    setTyped("");
+    setFailed(false);
+  }
+
   async function withdraw(event: FormEvent) {
     event.preventDefault();
     if (typed !== CONFIRM_WORD) return;
@@ -63,7 +80,7 @@ export function WithdrawSection() {
         </Button>
       </Card>
 
-      <Dialog open={open} onClose={() => setOpen(false)} title="정말 탈퇴할까요?">
+      <Dialog open={open} onClose={close} title="정말 탈퇴할까요?">
         <form onSubmit={withdraw} className="flex flex-col gap-3">
           <p className="text-[14px] leading-relaxed text-grey-700">
             지운 뒤에는 되돌릴 수 없어요. 계속하려면 아래에{" "}
@@ -85,7 +102,7 @@ export function WithdrawSection() {
           )}
 
           <div className="mt-2 flex items-center gap-2">
-            <Button type="button" variant="ghost" className="flex-1" disabled={busy} onClick={() => setOpen(false)}>
+            <Button type="button" variant="ghost" className="flex-1" disabled={busy} onClick={close}>
               취소
             </Button>
             <Button
