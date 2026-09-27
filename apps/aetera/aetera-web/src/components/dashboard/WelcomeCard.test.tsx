@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "@/test/render";
 import { errorResponse, jsonResponse } from "@/test/http";
-import { stubFetch } from "@/test/stubFetch";
+import { failFetch, stubFetch } from "@/test/stubFetch";
 import { WelcomeCard } from "./WelcomeCard";
 import type { ModuleSummary } from "@/lib/types";
 
@@ -113,7 +113,7 @@ describe("켜기", () => {
     const { user } = renderWithProviders(<WelcomeCard />);
     await waitFor(() => expect(enableButtons()).toHaveLength(3));
 
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(errorResponse(500, 5000001, "서버 오류"));
+    failFetch();
 
     await user.click(enableButtons()[0]);
 

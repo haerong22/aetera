@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "@/test/render";
-import { errorResponse, jsonResponse } from "@/test/http";
-import { lastBody, stubFetch } from "@/test/stubFetch";
+import { jsonResponse } from "@/test/http";
+import { failFetch, lastBody, stubFetch } from "@/test/stubFetch";
 import { GoalDialog } from "./GoalDialog";
 import type { Goal } from "../api";
 
@@ -127,7 +127,7 @@ describe("저장", () => {
 
   it("실패하면 말한다", async () => {
     const { user } = open(weekly);
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(errorResponse(500, 5000001));
+    failFetch();
 
     await user.click(screen.getByRole("button", { name: "저장" }));
 
