@@ -20,6 +20,20 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * 실패를 사람에게 보여 줄 한 줄로 바꾼다.
+ *
+ * 서버가 준 문구를 **그대로** 쓴다. "지금 비밀번호가 틀렸다"와 "새 비밀번호가 규칙에
+ * 안 맞는다"는 고쳐야 할 칸이 다른데, 한 문장으로 뭉뚱그리면 사용자는 어디를 고쳐야
+ * 할지 모른 채 둘 다 다시 적는다.
+ *
+ * [ApiError] 가 아닌 것(네트워크 끊김, 시간 초과)은 서버가 준 말이 없으므로 [fallback] 이
+ * 대신한다 — 그쪽은 부르는 화면이 무엇을 하려던 중이었는지 알아야 쓸 수 있는 문장이다.
+ */
+export function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof ApiError ? error.message : fallback;
+}
+
 let accessToken: string | null = null;
 
 export function setAccessToken(token: string | null) {

@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { ApiError } from "@/lib/api-client";
+import { errorMessage } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
@@ -26,7 +26,7 @@ export default function SignUpPage() {
       await signup({ email, nickname, password });
       router.replace("/dashboard");
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : "가입에 실패했어요. 잠시 후 다시 시도해 주세요.");
+      setError(errorMessage(caught, "가입에 실패했어요. 잠시 후 다시 시도해 주세요."));
     } finally {
       setSubmitting(false);
     }

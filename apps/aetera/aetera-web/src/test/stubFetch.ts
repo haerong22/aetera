@@ -48,11 +48,20 @@ export function stubFetch(respond: (request: Sent) => Response): { calls: Sent[]
  * 지금부터의 요청을 모두 실패로 만든다. [stubFetch] 로 세워 둔 가짜 서버를
  * **이 시험 하나에서만** 덮어쓴다 — 되돌리기는 [stubFetch] 의 `afterEach` 가 한다.
  *
- * "실패하면 알리는가" 를 보는 시험마다 같은 한 줄을 적고 있었다. 그 줄에는 아무도 읽지 않는
- * 오류 메시지까지 딸려 있었는데, 화면이 보여 주는 문구는 서버 것이 아니라 제 것이다.
+ * "실패하면 알리는가" 를 보는 시험마다 같은 한 줄을 적고 있었다.
+ *
+ * [message] 는 **화면이 서버 문구를 그대로 보여 주는지** 볼 때만 준다. 대부분의 화면은
+ * 제 문장을 띄우므로 서버가 뭐라 했는지 상관없고, 그때는 빼는 편이 시험이 무엇을 보는지
+ * 분명해진다 — 적어 두면 읽는 사람이 그 문구가 단언과 관련 있는 줄 안다.
  */
-export function failFetch(status = 500, code = 5000001): void {
-  vi.spyOn(globalThis, "fetch").mockResolvedValue(errorResponse(status, code));
+export function failFetch(
+  status = 500,
+  code = 5000001,
+  message?: string,
+): void {
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    message === undefined ? errorResponse(status, code) : errorResponse(status, code, message),
+  );
 }
 
 /** 마지막으로 **본문을 실어 보낸** 요청의 본문. 조회가 뒤따라도 저장한 것을 놓치지 않는다. */

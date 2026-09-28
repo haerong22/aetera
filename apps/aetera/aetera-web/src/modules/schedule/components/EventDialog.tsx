@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/components/ui/cn";
-import { ApiError } from "@/lib/api-client";
+import { errorMessage } from "@/lib/api-client";
 import { toDateTimeLocal } from "../calendar";
 import { DEFAULT_EVENT_COLOR, EVENT_COLORS } from "../colors";
 import {
@@ -96,7 +96,7 @@ export function EventDialog({ open, onClose, event, initialDate, initial }: Even
       else await create.mutateAsync(input);
       onClose();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : "저장에 실패했어요.");
+      setError(errorMessage(caught, "저장에 실패했어요."));
     }
   }
 
