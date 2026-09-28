@@ -31,8 +31,12 @@ interface RefreshTokenJpaRepository : JpaRepository<RefreshTokenJpaEntity, UUID>
      *
      * `update versioned` 여야 한다. 그냥 `update` 는 @Version 을 올리지 않아서, 이 갱신 전에
      * 엔티티를 읽어 둔 트랜잭션이 낡은 버전으로 덮어써도 충돌이 감지되지 않는다.
+     *
+     * `flushAutomatically` 는 지금 이 경로에서는 할 일이 없다(앞에 쓰기가 없다).
+     * 그래도 붙여 둔다 — [revokeAllByUserId] 가 이것을 빠뜨려 **비밀번호 변경이 통째로
+     * 사라졌었다.** 이 파일의 벌크 갱신은 예외 없이 둘 다 갖는다.
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
         "update versioned RefreshTokenJpaEntity t set t.revokedAt = :at, t.revokedReason = :reason " +
             "where t.uid = :id and t.revokedAt is null",
@@ -50,8 +54,13 @@ interface RefreshTokenJpaRepository : JpaRepository<RefreshTokenJpaEntity, UUID>
      * 남은 토큰이 사유를 ROTATED 로 유지한 채 살아남아 "부활 티켓"이 된다 — 전체 폐기 직후
      * 그 토큰을 재생하면 유예 판정을 통과해 새 세션이 발급되고, 대응이 통째로 무력해진다.
      * 폐기 시각은 원래 값을 보존하고 사유만 덮는다.
+     *
+     * **`flushAutomatically` 가 없으면 안 된다.** 비밀번호 변경은 새 해시를 저장한 **뒤에**
+     * 이것을 부르는데, 저장은 아직 영속성 컨텍스트에 표시만 돼 있다. 여기서 flush 없이
+     * `clearAutomatically` 로 비우면 그 표시가 버려져 **세션만 끊기고 비밀번호는 그대로** 남는다.
+     * 화면은 성공이라고 답하므로 아무도 모른다 — 통합 시험이 두 기기로 잡아낸 실제 버그다.
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
         "update versioned RefreshTokenJpaEntity t set t.revokedAt = coalesce(t.revokedAt, :at), t.revokedReason = :reason " +
             "where t.userId = :userId",

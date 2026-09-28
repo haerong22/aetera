@@ -16,9 +16,12 @@ class AuthCredential private constructor(
     val userId: UserId,
     val provider: AuthProvider,
     val providerUserId: String?,
-    val passwordHash: EncryptedPassword?,
+    passwordHash: EncryptedPassword?,
     val createdAt: Instant,
 ) {
+    var passwordHash: EncryptedPassword? = passwordHash
+        private set
+
     init {
         when (provider) {
             AuthProvider.EMAIL -> {
@@ -37,6 +40,25 @@ class AuthCredential private constructor(
                 )
             }
         }
+    }
+
+    /**
+     * 비밀번호를 갈아 끼운다.
+     *
+     * 새 비밀번호가 규칙을 지키는지, 지금 것과 같지는 않은지는 **여기서 보지 않는다** —
+     * 이 클래스는 해시만 알고 평문을 모르기 때문이다. 그 둘은 부르는 쪽
+     * ([ChangePasswordService][io.aetera.usecase.auth.ChangePasswordService])의 몫이다.
+     *
+     * 소셜 계정에는 갈아 끼울 자리가 없다. 비밀번호 칸이 비어 있는데 채워 넣으면
+     * [init] 이 지키던 "소셜은 비밀번호를 갖지 않는다"가 조용히 무너진다.
+     */
+    fun changePassword(newPasswordHash: EncryptedPassword) {
+        ensure(
+            provider == AuthProvider.EMAIL,
+            AuthErrorCode.PASSWORD_LOGIN_NOT_AVAILABLE,
+            "비밀번호를 쓰지 않는 인증 수단입니다. provider=$provider",
+        )
+        passwordHash = newPasswordHash
     }
 
     override fun equals(other: Any?): Boolean = this === other || (other is AuthCredential && id == other.id)

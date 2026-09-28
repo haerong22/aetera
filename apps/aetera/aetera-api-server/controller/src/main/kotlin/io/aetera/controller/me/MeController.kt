@@ -2,11 +2,13 @@ package io.aetera.controller.me
 
 import io.aetera.controller.auth.RefreshTokenCookie
 import io.aetera.controller.common.CurrentUserId
+import io.aetera.usecase.auth.ChangePasswordService
 import io.aetera.usecase.module.DisableModuleService
 import io.aetera.usecase.module.EnableModuleService
 import io.aetera.usecase.module.FindMyModulesService
 import io.aetera.usecase.module.ModuleSummaryDto
 import io.aetera.usecase.module.ReorderModulesService
+import io.aetera.usecase.user.ChangeNicknameService
 import io.aetera.usecase.user.GetMyProfileService
 import io.aetera.usecase.user.UserDto
 import io.aetera.usecase.user.WithdrawService
@@ -30,6 +32,8 @@ import java.util.UUID
 @Tag(name = "Me")
 class MeController(
     private val getMyProfileService: GetMyProfileService,
+    private val changeNicknameService: ChangeNicknameService,
+    private val changePasswordService: ChangePasswordService,
     private val withdrawService: WithdrawService,
     @param:Value("\${aetera.auth.cookie-secure}") private val cookieSecure: Boolean,
     private val findMyModulesService: FindMyModulesService,
@@ -42,6 +46,33 @@ class MeController(
     fun getMe(
         @CurrentUserId userId: UUID,
     ): UserDto = getMyProfileService.getMyProfile(userId)
+
+    @PutMapping
+    @Operation(summary = "닉네임 변경. 이메일은 로그인 아이디라 바꾸지 않는다.")
+    fun changeNickname(
+        @CurrentUserId userId: UUID,
+        @RequestBody req: ChangeNicknameReq,
+    ): UserDto = changeNicknameService.changeNickname(userId, req.nickname)
+
+    /**
+     * 비밀번호 변경.
+     *
+     * **새 쿠키를 함께 내려보낸다.** 이 유스케이스는 다른 기기를 끊으면서 이 기기 몫을
+     * 새로 발급하는데, 쿠키를 갱신하지 않으면 브라우저가 방금 끊긴 토큰을 들고 다니다
+     * 다음 재발급에서 로그아웃된다 — 비밀번호를 바꿨더니 튕기는 꼴이 된다.
+     */
+    @PutMapping("/password")
+    @Operation(summary = "비밀번호 변경. 다른 기기의 세션을 모두 끊고 이 기기만 새로 발급한다.")
+    fun changePassword(
+        @CurrentUserId userId: UUID,
+        @RequestBody req: ChangePasswordReq,
+    ): ResponseEntity<Void> {
+        val session = changePasswordService.changePassword(req.toCommand(userId))
+        return ResponseEntity
+            .noContent()
+            .header(HttpHeaders.SET_COOKIE, RefreshTokenCookie.issue(session.refreshToken, cookieSecure).toString())
+            .build()
+    }
 
     @GetMapping("/modules")
     @Operation(summary = "모듈 목록 조회. 배포된 모든 모듈에 나의 사용 상태가 얹혀 온다.")
