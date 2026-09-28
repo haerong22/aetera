@@ -27,6 +27,13 @@ interface AuthContextValue {
   signup: (input: { email: string; nickname: string; password: string }) => Promise<void>;
   login: (input: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
+  /**
+   * 서버가 돌려준 새 프로필을 앱 전체에 반영한다.
+   *
+   * 닉네임은 사이드바와 인사말이 **여기 있는 `user` 를 보고** 그린다. 설정 화면에서만
+   * 바꿔 두면 저장은 됐는데 화면 곳곳에 옛 이름이 남아, 안 바뀐 것처럼 보인다.
+   */
+  applyProfile: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -121,9 +128,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [resetSession]);
 
+  const applyProfile = useCallback((updated: User) => setUser(updated), []);
+
   const value = useMemo(
-    () => ({ status, user, signup, login, logout }),
-    [status, user, signup, login, logout],
+    () => ({ status, user, signup, login, logout, applyProfile }),
+    [status, user, signup, login, logout, applyProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

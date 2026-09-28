@@ -7,6 +7,7 @@ import { LinkButton } from "@/components/ui/LinkButton";
 import { EmptyState } from "@/components/ui/StatusCard";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { ProfileSection } from "@/components/settings/ProfileSection";
 import { NotificationSection } from "@/components/settings/NotificationSection";
 import { ExportSection } from "@/components/settings/ExportSection";
 import { WithdrawSection } from "@/components/settings/WithdrawSection";
@@ -172,6 +173,8 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-grey-900">설정</h1>
       </div>
+
+      <ProfileSection />
 
       <NotificationSection />
 
