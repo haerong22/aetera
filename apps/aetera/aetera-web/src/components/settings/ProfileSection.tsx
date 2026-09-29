@@ -7,6 +7,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { errorMessage } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth";
+import { NewPasswordFields, useNewPassword } from "@/components/auth/NewPasswordFields";
 import { useChangeNickname, useChangePassword } from "@/lib/profile";
 import type { User } from "@/lib/types";
 
@@ -110,8 +111,7 @@ function NicknameForm({ nickname, onSaved }: { nickname: string; onSaved: (user:
 function PasswordCard() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
-  const [next, setNext] = useState("");
-  const [again, setAgain] = useState("");
+  const password = useNewPassword();
   const [done, setDone] = useState(false);
   const change = useChangePassword();
 
@@ -119,30 +119,24 @@ function PasswordCard() {
     if (change.isPending) return;
     setOpen(false);
     setCurrent("");
-    setNext("");
-    setAgain("");
+    password.clear();
     change.reset();
   }
 
-  /*
-   * 서버는 두 번째 칸을 모른다 — 오타를 걸러 주는 것은 화면 몫이다. 이게 없으면
-   * 오타난 비밀번호가 그대로 저장되고, 본인도 다음 로그인에서야 알게 된다.
-   */
-  const mismatched = again !== "" && next !== again;
-  const ready = current !== "" && next !== "" && next === again;
+  // 지금 비밀번호까지 있어야 보낼 수 있다. 새 비밀번호 두 칸은 [NewPasswordFields] 가 본다.
+  const ready = current !== "" && password.ready;
 
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!ready) return;
     change.mutate(
-      { currentPassword: current, newPassword: next },
+      { currentPassword: current, newPassword: password.value },
       {
         onSuccess: () => {
           setDone(true);
           setOpen(false);
           setCurrent("");
-          setNext("");
-          setAgain("");
+          password.clear();
         },
       },
     );
@@ -185,30 +179,8 @@ function PasswordCard() {
             disabled={change.isPending}
             onChange={(event) => setCurrent(event.target.value)}
           />
-          <Input
-            label="새 비밀번호"
-            type="password"
-            autoComplete="new-password"
-            value={next}
-            disabled={change.isPending}
-            onChange={(event) => setNext(event.target.value)}
-          />
-          <Input
-            label="새 비밀번호 확인"
-            type="password"
-            autoComplete="new-password"
-            value={again}
-            disabled={change.isPending}
-            onChange={(event) => setAgain(event.target.value)}
-          />
+          <NewPasswordFields password={password} disabled={change.isPending} />
 
-          <p className="text-[12.5px] text-grey-500">영문과 숫자를 섞어 8자 이상이어야 해요.</p>
-
-          {mismatched && (
-            <p role="alert" className="text-[13px] text-danger">
-              새 비밀번호가 서로 달라요.
-            </p>
-          )}
           {change.isError && (
             <p role="alert" className="text-[13px] text-danger">
               {errorMessage(change.error, "비밀번호를 바꾸지 못했어요.")}

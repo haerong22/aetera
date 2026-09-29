@@ -67,6 +67,13 @@ export default function LoginPage() {
         </Button>
       </form>
 
+      {/* 못 들어오는 사람이 찾을 곳. 로그인이 실패한 뒤에야 보이면 이미 한 번 막힌 뒤다. */}
+      <p className="mt-4 text-center text-[14px]">
+        <Link href="/forgot-password" className="text-grey-500 hover:text-grey-700 hover:underline">
+          비밀번호를 잊으셨나요?
+        </Link>
+      </p>
+
       <p className="mt-6 text-center text-[14px] text-grey-500">
         아직 계정이 없나요?{" "}
         <Link href="/signup" className="font-semibold text-primary hover:underline">
