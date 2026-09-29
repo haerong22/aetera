@@ -1,9 +1,9 @@
 package io.aetera.usecase.notification
 
+import io.aetera.model.mail.MailSender
 import io.aetera.model.notification.NoticeDigest
 import io.aetera.model.notification.NotificationPreference
 import io.aetera.model.notification.NotificationPreferenceRepository
-import io.aetera.model.notification.NotificationSender
 import io.aetera.model.user.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -34,7 +34,7 @@ class SendDigestService(
     private val notificationPreferenceRepository: NotificationPreferenceRepository,
     private val userRepository: UserRepository,
     private val buildDigestService: BuildDigestService,
-    private val sender: NotificationSender,
+    private val mailSender: MailSender,
     private val clock: Clock,
 ) {
     fun send(preference: NotificationPreference): Boolean {
@@ -47,7 +47,7 @@ class SendDigestService(
          * 이 순서의 대가는 **보낸 뒤 저장이 실패하면 다음 시각에 한 번 더 간다**는 것이다.
          * 알고 고른 쪽이다 — 같은 메일을 두 번 받는 것보다 놓치는 쪽이 훨씬 나쁘다.
          */
-        sender.send(plan.digest)
+        mailSender.send(plan.digest.toMail())
         transactionTemplate.execute {
             preference.markSent(plan.on)
             notificationPreferenceRepository.save(preference)

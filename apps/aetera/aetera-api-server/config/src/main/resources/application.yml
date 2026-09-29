@@ -33,8 +33,9 @@ aetera:
     cookie-secure: false
   cors:
     allowed-origins: http://localhost:3000
-  notification:
+  mail:
     # log = 메일 대신 로그로 찍는다. SMTP 자격증명이 준비되면 email 로 바꾼다.
+    # 다이제스트와 비밀번호 재설정이 이 하나를 같이 쓴다.
     sender: log
     # sender=log 에서는 쓰이지 않지만, 로컬에서 email 로 바꿔 볼 때 이것 때문에
     # 또 한 번 못 뜨는 일이 없도록 둔다. 표시 이름을 붙이지 않는 이유는 prod 쪽에 적어 뒀다.

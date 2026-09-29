@@ -1,5 +1,6 @@
 package io.aetera.model.notification
 
+import io.aetera.model.mail.Mail
 import io.aetera.model.module.Notice
 import io.aetera.model.user.Email
 import java.time.LocalDate
@@ -53,6 +54,9 @@ data class NoticeDigest(
                 appendLine()
                 append("알림을 그만 받으려면 아이테라 설정에서 끌 수 있어요.")
             }
+
+    /** 보낼 한 통으로 바꾼다. 글을 짓는 일은 위에서 끝나 있고, 여기서는 봉투에 담기만 한다. */
+    fun toMail(): Mail = Mail(to = to, subject = subject, body = body)
 
     private fun formatDay(on: LocalDate): String = "${on.monthValue}월 ${on.dayOfMonth}일"
 }
