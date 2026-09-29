@@ -100,7 +100,10 @@ class WithdrawIntegrationTest {
      * 하나만 심으면 놓친다 — 처음 버그를 만났을 때 자산만 있는 계정으로는 멀쩡히 지워졌고,
      * 일곱을 다 채운 계정에서만 셋이 남았다. 기여자가 여럿일 때만 드러나는 문제였다.
      */
-    private fun seedEverything(token: String) {
+    private fun seedEverything(
+        token: String,
+        email: String,
+    ) {
         listOf("asset", "income", "expense", "goal", "renewal", "schedule", "resignation")
             .forEach { post(token, "/api/v1/me/modules/$it/enablement") }
 
@@ -137,6 +140,17 @@ class WithdrawIntegrationTest {
             """{"done":true,"note":"확인"}""",
         )
         put(token, "/api/v1/me/notifications", """{"enabled":true,"sendHour":9}""")
+
+        /*
+         * 재설정 토큰도 한 줄 만들어 둔다. 없으면 "심기 전" 단언이 0 이라 헛통과하고,
+         * 탈퇴가 이 표를 안 지워도 아무도 모른다.
+         */
+        mockMvc
+            .post()
+            .uri("/api/v1/auth/password-reset")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"email":"$email"}""")
+            .exchange()
     }
 
     private val perUserTables =
@@ -152,13 +166,14 @@ class WithdrawIntegrationTest {
             "notification_preferences",
             "auth_credentials",
             "refresh_tokens",
+            "password_reset_tokens",
         )
 
     @Test
     fun `탈퇴하면 모든 표에서 사라진다`() {
         val email = "withdraw-all@example.com"
         val token = signUp(email)
-        seedEverything(token)
+        seedEverything(token, email)
         val userId = userIdOf(email)
 
         // 심은 것이 실제로 들어갔는지 먼저 확인한다 — 안 그러면 "0 == 0" 으로 헛통과한다.
@@ -183,7 +198,7 @@ class WithdrawIntegrationTest {
     fun `가이드의 할 일 진행도 남지 않는다`() {
         val email = "withdraw-guide@example.com"
         val token = signUp(email)
-        seedEverything(token)
+        seedEverything(token, email)
 
         mockMvc
             .delete()

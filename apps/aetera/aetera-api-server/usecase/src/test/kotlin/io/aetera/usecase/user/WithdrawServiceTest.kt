@@ -1,6 +1,7 @@
 package io.aetera.usecase.user
 
 import io.aetera.model.auth.AuthCredentialRepository
+import io.aetera.model.auth.PasswordResetTokenRepository
 import io.aetera.model.auth.RefreshTokenRepository
 import io.aetera.model.module.ModuleEnrollmentRepository
 import io.aetera.model.module.UserDataContributor
@@ -42,6 +43,7 @@ class WithdrawServiceTest :
         val userRepository = mockk<UserRepository>(relaxed = true)
         val authCredentialRepository = mockk<AuthCredentialRepository>(relaxed = true)
         val refreshTokenRepository = mockk<RefreshTokenRepository>(relaxed = true)
+        val passwordResetTokenRepository = mockk<PasswordResetTokenRepository>(relaxed = true)
         val moduleEnrollmentRepository = mockk<ModuleEnrollmentRepository>(relaxed = true)
         val notificationPreferenceRepository = mockk<NotificationPreferenceRepository>(relaxed = true)
 
@@ -64,6 +66,7 @@ class WithdrawServiceTest :
             userRepository,
             authCredentialRepository,
             refreshTokenRepository,
+            passwordResetTokenRepository,
             moduleEnrollmentRepository,
             notificationPreferenceRepository,
         )
@@ -104,6 +107,8 @@ class WithdrawServiceTest :
                 verify { notificationPreferenceRepository.deleteAllByUserId(owner) }
                 verify { authCredentialRepository.deleteAllByUserId(owner) }
                 verify { refreshTokenRepository.deleteAllByUserId(owner) }
+                // 재설정 토큰이 남으면 지운 계정의 메일 링크로 다시 비밀번호를 정할 수 있다.
+                verify { passwordResetTokenRepository.deleteAllByUserId(owner) }
             }
 
             /*

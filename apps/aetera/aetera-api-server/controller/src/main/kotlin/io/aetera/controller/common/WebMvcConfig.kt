@@ -28,6 +28,12 @@ class WebMvcConfig(
                 "/api/v1/auth/login",
                 "/api/v1/auth/refresh",
                 "/api/v1/auth/logout",
+                /*
+                 * 비밀번호 재설정은 **못 들어오는 사람**이 쓰는 길이다. 여기 빠지면
+                 * 로그인해야만 비밀번호를 찾을 수 있게 되어 기능이 통째로 무의미해진다.
+                 */
+                "/api/v1/auth/password-reset",
+                "/api/v1/auth/password-reset/confirm",
             )
 
         // 인증 인터셉터가 실어 둔 사용자 아이디에 의존하므로 반드시 그 뒤에 선다.

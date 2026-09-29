@@ -1,6 +1,7 @@
 package io.aetera.usecase.user
 
 import io.aetera.model.auth.AuthCredentialRepository
+import io.aetera.model.auth.PasswordResetTokenRepository
 import io.aetera.model.auth.RefreshTokenRepository
 import io.aetera.model.module.ModuleEnrollmentRepository
 import io.aetera.model.module.UserDataContributor
@@ -35,6 +36,7 @@ class WithdrawService(
     private val userRepository: UserRepository,
     private val authCredentialRepository: AuthCredentialRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val moduleEnrollmentRepository: ModuleEnrollmentRepository,
     private val notificationPreferenceRepository: NotificationPreferenceRepository,
 ) {
@@ -57,6 +59,7 @@ class WithdrawService(
          * 아니지만(이미 인증을 통과했다), 실패해 롤백됐을 때 남는 그림이 덜 헷갈린다.
          */
         refreshTokenRepository.deleteAllByUserId(owner)
+        passwordResetTokenRepository.deleteAllByUserId(owner)
         authCredentialRepository.deleteAllByUserId(owner)
 
         userRepository.delete(user)

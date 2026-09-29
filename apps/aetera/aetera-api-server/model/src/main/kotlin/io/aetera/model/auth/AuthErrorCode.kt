@@ -30,6 +30,18 @@ enum class AuthErrorCode(
     UNAUTHENTICATED(ErrorKind.UNAUTHENTICATED, ErrorCode.AUTH_BAND + 2, "로그인이 필요합니다."),
     INVALID_REFRESH_TOKEN(ErrorKind.UNAUTHENTICATED, ErrorCode.AUTH_BAND + 3, "세션이 만료되었습니다. 다시 로그인해 주세요."),
 
+    /**
+     * 없는 토큰·만료된 토큰·이미 쓴 토큰을 **한 코드로 묶는다.**
+     *
+     * 나누면 "이 토큰은 있지만 만료됐다"가 되어, 링크를 주워 온 사람에게 그 링크가
+     * 진짜였다는 사실을 알려 준다. 사용자가 할 일은 어느 쪽이든 하나다 — 다시 요청하기.
+     */
+    INVALID_PASSWORD_RESET_TOKEN(
+        ErrorKind.UNAUTHENTICATED,
+        ErrorCode.AUTH_BAND + 4,
+        "링크가 만료되었거나 이미 사용되었습니다. 다시 요청해 주세요.",
+    ),
+
     /** 카카오 등으로만 가입한 계정. 지금은 이메일 가입뿐이라 닿지 않지만, 바꿀 자리가 없다는 사실은 지금도 참이다. */
     PASSWORD_LOGIN_NOT_AVAILABLE(ErrorKind.CONFLICT, ErrorCode.AUTH_BAND + 1, "비밀번호 로그인을 쓰지 않는 계정입니다."),
 }

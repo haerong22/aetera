@@ -40,6 +40,9 @@ aetera:
     # RFC 2047 로 인코딩해야 하는데, SimpleMailMessage 는 그걸 해 주지 않는다 —
     # 인코딩 없이 나간 헤더는 받는 서버에 따라 깨지거나 거부된다.
     from: ${MAIL_FROM:no-reply@aetera.io}
+  web:
+    # 재설정 링크의 목적지. 요청 헤더에서 가져오지 않는 이유는 application.yml 에 적었다.
+    base-url: ${WEB_BASE_URL:https://app.aetera.io}
 
 management:
   endpoints:

@@ -6,6 +6,8 @@ import io.aetera.usecase.auth.AuthSessionDto
 import io.aetera.usecase.auth.LoginService
 import io.aetera.usecase.auth.LogoutService
 import io.aetera.usecase.auth.RefreshSessionService
+import io.aetera.usecase.auth.RequestPasswordResetService
+import io.aetera.usecase.auth.ResetPasswordService
 import io.aetera.usecase.auth.SignUpService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -27,6 +29,8 @@ class AuthController(
     private val loginService: LoginService,
     private val refreshSessionService: RefreshSessionService,
     private val logoutService: LogoutService,
+    private val requestPasswordResetService: RequestPasswordResetService,
+    private val resetPasswordService: ResetPasswordService,
     @Value("\${aetera.auth.cookie-secure:false}") private val cookieSecure: Boolean,
 ) {
     @PostMapping("/signup")
@@ -47,6 +51,40 @@ class AuthController(
         val rawToken =
             RefreshTokenCookie.read(request) ?: throw CoreException(AuthErrorCode.INVALID_REFRESH_TOKEN)
         return sessionResponse(refreshSessionService.refresh(rawToken))
+    }
+
+    /**
+     * 비밀번호 재설정 요청.
+     *
+     * **가입 여부와 상관없이 항상 204 다.** 구분해서 답하면 이 주소가 가입 여부 조회기가 된다 —
+     * 주소록을 넣고 돌리면 어느 주소가 이 서비스를 쓰는지 가려낼 수 있다.
+     */
+    @PostMapping("/password-reset")
+    @Operation(summary = "비밀번호 재설정 메일 요청. 가입 여부를 알려 주지 않으려고 언제나 204 다.")
+    fun requestPasswordReset(
+        @RequestBody req: RequestPasswordResetReq,
+    ): ResponseEntity<Void> {
+        requestPasswordResetService.request(req.email)
+        return ResponseEntity.noContent().build()
+    }
+
+    /**
+     * 링크로 받은 토큰으로 비밀번호를 다시 정한다.
+     *
+     * 세션을 주지 않는다 — 여기까지 온 사람이 정말 주인인지 아는 것은 **메일함을 열었다**는
+     * 사실뿐이다. 그대로 로그인시키는 대신 로그인 화면으로 보내 새 비밀번호를 한 번 쓰게 한다.
+     * 방금 정한 것을 손으로 넣어 보는 것이 오타를 마지막으로 거르는 자리이기도 하다.
+     */
+    @PostMapping("/password-reset/confirm")
+    @Operation(summary = "비밀번호 재설정. 모든 세션이 끊기고 로그인은 새로 해야 한다.")
+    fun resetPassword(
+        @RequestBody req: ResetPasswordReq,
+    ): ResponseEntity<Void> {
+        resetPasswordService.reset(req.toCommand())
+        return ResponseEntity
+            .noContent()
+            .header(HttpHeaders.SET_COOKIE, RefreshTokenCookie.expire(cookieSecure).toString())
+            .build()
     }
 
     @PostMapping("/logout")
