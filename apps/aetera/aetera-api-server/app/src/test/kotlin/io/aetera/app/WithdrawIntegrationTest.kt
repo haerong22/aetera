@@ -26,7 +26,17 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester
  * flush/clear 가 실제와 다르게 움직이고, 방금 그 버그를 놓친다.
  */
 @Tag("integration")
-@SpringBootTest(properties = ["security.password.iterations=1000"])
+/*
+ * 호출 한도를 끈다. 이 시험들은 전부 같은 주소에서 수십 번 부르므로 켜 두면
+ * 한도에 걸려 무너진다 — 여기서 볼 것은 한도가 아니다.
+ * 한도 자체는 [RateLimitIntegrationTest] 가 본다.
+ */
+@SpringBootTest(
+    properties = [
+        "security.password.iterations=1000",
+        "aetera.rate-limit.enabled=false",
+    ],
+)
 @AutoConfigureMockMvc
 @Import(TestcontainersConfig::class)
 class WithdrawIntegrationTest {

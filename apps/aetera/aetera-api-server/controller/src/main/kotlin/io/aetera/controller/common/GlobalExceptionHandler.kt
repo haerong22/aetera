@@ -4,6 +4,7 @@ import io.aetera.shared.error.CoreException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.HttpMediaTypeNotSupportedException
@@ -89,6 +90,27 @@ class GlobalExceptionHandler {
     fun handleConcurrentModification(e: Exception): ResponseEntity<ErrorRes> {
         log.warn { "동시 수정 충돌: ${e.message}" }
         return webError(WebErrorCode.CONCURRENT_MODIFICATION)
+    }
+
+    /**
+     * `Retry-After` 를 헤더로, 같은 값을 **본문 문장에도** 넣는다.
+     *
+     * 헤더는 기계가 읽고 사람은 못 본다. "잠시 후"라고만 적으면 얼마나 잠시인지 몰라
+     * 계속 두드리게 되고, 그건 막으려던 부하를 그대로 만든다.
+     */
+    @ExceptionHandler(RateLimitedException::class)
+    fun handleRateLimited(e: RateLimitedException): ResponseEntity<ErrorRes> {
+        log.warn { e.message }
+        val seconds = e.retryAfter.seconds.coerceAtLeast(1)
+        return ResponseEntity
+            .status(WebErrorCode.TOO_MANY_REQUESTS.status)
+            .header(HttpHeaders.RETRY_AFTER, seconds.toString())
+            .body(
+                ErrorRes(
+                    WebErrorCode.TOO_MANY_REQUESTS.code,
+                    "요청이 너무 잦습니다. ${seconds}초 뒤에 다시 시도해 주세요.",
+                ),
+            )
     }
 
     @ExceptionHandler(Exception::class)

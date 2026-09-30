@@ -26,6 +26,12 @@ enum class WebErrorCode(
 
     UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 1, "지원하지 않는 요청 형식입니다."),
 
+    /**
+     * 도메인이 아니라 **전송 계층의 판단**이라 여기 있다. 무엇을 하려던 요청이든
+     * "너무 잦다"는 답은 같고, 도메인은 이런 일이 있었는지도 모른다.
+     */
+    TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, 1, "요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요."),
+
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 1, "일시적인 오류가 발생했습니다."),
     ;
 

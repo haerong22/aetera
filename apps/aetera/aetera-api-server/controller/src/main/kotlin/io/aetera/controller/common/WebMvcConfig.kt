@@ -13,12 +13,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  */
 @Configuration(proxyBeanMethods = false)
 class WebMvcConfig(
+    private val rateLimitInterceptor: RateLimitInterceptor,
     private val authInterceptor: AuthInterceptor,
     private val moduleGuardInterceptor: ModuleGuardInterceptor,
     private val currentUserIdArgumentResolver: CurrentUserIdArgumentResolver,
     @Value("\${aetera.cors.allowed-origins:http://localhost:3000}") private val allowedOrigins: List<String>,
 ) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
+        /*
+         * 인증보다 **먼저** 선다. 막으려는 것이 로그인·비밀번호 찾기처럼 인증을 통과하지
+         * 못한 요청이라, 인증 뒤에 두면 정작 필요한 자리에서 한 번도 돌지 않는다.
+         */
+        registry
+            .addInterceptor(rateLimitInterceptor)
+            .order(0)
+            .addPathPatterns("/api/v1/auth/**")
+
         registry
             .addInterceptor(authInterceptor)
             .order(1)

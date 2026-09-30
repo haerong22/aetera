@@ -44,6 +44,14 @@ aetera:
     # 재설정 링크의 목적지. 요청 헤더에서 가져오지 않는 이유는 application.yml 에 적었다.
     base-url: ${WEB_BASE_URL:https://app.aetera.io}
 
+server:
+  # X-Forwarded-* 를 믿고 실제 클라이언트 주소를 복원한다. 이게 없으면 호출 한도가
+  # **로드밸런서 하나를 한 사람으로** 세어, 누구 하나가 한도를 쓰면 모두가 막힌다.
+  #
+  # 로컬·개발에는 켜지 않는다. 이 헤더는 누구나 보낼 수 있어서, 믿어도 되는 것은 그것을
+  # 반드시 덮어쓰는 프록시 뒤에 있을 때뿐이다 — 아무 데서나 켜면 한도를 우회하는 길이 된다.
+  forward-headers-strategy: framework
+
 management:
   endpoints:
     web:
