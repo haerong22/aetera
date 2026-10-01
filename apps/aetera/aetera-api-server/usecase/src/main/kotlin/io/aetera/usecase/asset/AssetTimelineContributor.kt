@@ -6,9 +6,9 @@ import io.aetera.model.module.ModuleId
 import io.aetera.model.module.TimelineContributor
 import io.aetera.model.module.TimelineEntry
 import io.aetera.model.user.UserId
+import io.aetera.usecase.common.money
 import org.springframework.stereotype.Component
 import java.time.LocalDate
-import java.util.Locale
 
 /**
  * 달마다 찍은 순자산을 타임라인에 낸다.
@@ -36,10 +36,4 @@ class AssetTimelineContributor(
                 title = "순자산 ${money(entries.netWorth())}원",
             )
         }
-
-    /**
-     * 로케일을 못 박는다. 기본 로케일에 맡기면 컨테이너 설정에 따라 자릿점이 달라져
-     * 같은 코드가 `48.200.000` 이나 `4,82,00,000` 을 낸다.
-     */
-    private fun money(amount: Long): String = String.format(Locale.KOREA, "%,d", amount)
 }

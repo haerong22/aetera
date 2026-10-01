@@ -15,7 +15,7 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
  * 예전에는 "schedule 이 아직 없는 패키지들을 참조하지 않는다"로 적혀 있었는데,
  * 대상이 비어 있으면 규칙이 언제나 통과해서 아무것도 지키지 않았다.
  */
-private val MODULE_PACKAGES = listOf("schedule", "guide", "renewal", "goal", "expense", "asset", "timeline", "income")
+private val MODULE_PACKAGES = listOf("schedule", "guide", "renewal", "goal", "expense", "asset", "timeline", "income", "spending")
 
 // notification 과 export 는 이 목록에 없다. 모듈이 아니라 **모듈들이 모여드는 코어 기능**이라
 // 격리 규칙의 대상이 아니다 — 목록에 넣으면 기여자를 가진 모듈 전부와 "서로 참조 금지"가 걸린다.
