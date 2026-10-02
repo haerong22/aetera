@@ -10,6 +10,7 @@ import { goalModule } from "./goal";
 import { expenseModule } from "./expense";
 import { assetModule } from "./asset";
 import { incomeModule } from "./income";
+import { spendingModule } from "./spending";
 import { timelineModule } from "./timeline";
 
 /**
@@ -30,6 +31,7 @@ export const frontendModules: FrontendModule[] = [
   expenseModule,
   assetModule,
   incomeModule,
+  spendingModule,
   timelineModule,
 ];
 

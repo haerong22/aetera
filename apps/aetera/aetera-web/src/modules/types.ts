@@ -14,6 +14,13 @@ export interface ModuleCapabilities {
   AddEventDialog?: ComponentType<CalendarDraftProps>;
   /** 한 달에 나가는 고정지출. */
   MonthlyFixedCost?: ComponentType<AmountProviderProps>;
+  /**
+   * 한 달에 쓰는 변동지출. 고정지출과 더해야 "한 달에 얼마 나가나"가 된다.
+   *
+   * 고정지출은 등록된 금액이 곧 답이지만 이쪽은 **지난 달들의 평균**이다 — 지나 봐야 아는
+   * 돈이라서다. 그래서 [ProvidedAmount.note] 가 몇 달치 평균인지 반드시 밝힌다.
+   */
+  MonthlyVariableCost?: ComponentType<AmountProviderProps>;
   /** 당장 쓸 수 있는 현금. */
   CashOnHand?: ComponentType<AmountProviderProps>;
   /** 일을 그만둬도 이어지는 한 달 소득. 전체 소득이 아니다 — 월급은 빠져 있다. */

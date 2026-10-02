@@ -38,6 +38,10 @@ export function useMonthlyFixedCost(): Capability<"MonthlyFixedCost"> {
   return useCapability("MonthlyFixedCost");
 }
 
+export function useMonthlyVariableCost(): Capability<"MonthlyVariableCost"> {
+  return useCapability("MonthlyVariableCost");
+}
+
 export function useCashOnHand(): Capability<"CashOnHand"> {
   return useCapability("CashOnHand");
 }

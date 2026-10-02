@@ -10,6 +10,7 @@ import {
   useCashOnHand,
   useContinuingIncome,
   useMonthlyFixedCost,
+  useMonthlyVariableCost,
 } from "../capabilityRegistry";
 import { TaskToolPanel } from "../guide/components/TaskToolPanel";
 import { formatRunsOut, runwayMonths } from "./runway";
@@ -104,7 +105,7 @@ function LinkedAmount({
   );
 }
 
-type Field = "cash" | "fixedCost" | "income";
+type Field = "cash" | "fixedCost" | "livingCost" | "income";
 
 /**
  * 다음 수입까지의 공백을 개월 수로 바꿔 본다.
@@ -119,6 +120,7 @@ type Field = "cash" | "fixedCost" | "income";
 export function RunwayTool() {
   const CashOnHand = useCashOnHand();
   const MonthlyFixedCost = useMonthlyFixedCost();
+  const MonthlyVariableCost = useMonthlyVariableCost();
   const ContinuingIncome = useContinuingIncome();
 
   const [typedCash, setTypedCash] = useState("");
@@ -130,22 +132,26 @@ export function RunwayTool() {
   const [overridden, setOverridden] = useState<Record<Field, boolean>>({
     cash: false,
     fixedCost: false,
+    livingCost: false,
     income: false,
   });
 
   const linkCash = CashOnHand !== null && !overridden.cash;
   const linkFixedCost = MonthlyFixedCost !== null && !overridden.fixedCost;
+  const linkLivingCost = MonthlyVariableCost !== null && !overridden.livingCost;
   const linkIncome = ContinuingIncome !== null && !overridden.income;
 
   const missing = missingProviders([
     ["자산", CashOnHand],
     ["고정지출", MonthlyFixedCost],
+    ["변동지출", MonthlyVariableCost],
     ["소득", ContinuingIncome],
   ]);
 
   const setTyped: Record<Field, (value: string) => void> = {
     cash: setTypedCash,
     fixedCost: setTypedFixedCost,
+    livingCost: setLivingCost,
     income: setTypedIncome,
   };
 
@@ -164,11 +170,22 @@ export function RunwayTool() {
   function body(
     linkedCash: ProvidedAmount | null,
     linkedFixedCost: ProvidedAmount | null,
+    linkedLivingCost: ProvidedAmount | null,
     linkedIncome: ProvidedAmount | null,
   ) {
     const cash = linkCash ? (linkedCash?.amount ?? null) : Number(typedCash || "0");
     const fixedCost = linkFixedCost ? (linkedFixedCost?.amount ?? null) : Number(typedFixedCost || "0");
-    const monthlyBurn = fixedCost === null ? null : fixedCost + Number(livingCost || "0");
+    /*
+     * 변동비는 **지나 봐야 아는 돈**이라 지난 달들의 평균으로 받는다.
+     *
+     * 변동지출 모듈이 꺼져 있으면 예전처럼 직접 적는 선택 칸이고, 비워 두면 0 이다.
+     * 0 은 **답을 넉넉하게 틀리는 쪽**이라(나가는 돈을 덜 세면 더 오래 버티는 것으로 나온다)
+     * 모듈을 켜 두는 편이 낫다 — 그래서 꺼져 있으면 아래에 켜라고 권한다.
+     */
+    const livingCostValue = linkLivingCost
+      ? (linkedLivingCost?.amount ?? 0)
+      : Number(livingCost || "0");
+    const monthlyBurn = fixedCost === null ? null : fixedCost + livingCostValue;
 
     /*
      * 소득은 아직 못 읽었으면 0 으로 본다. 나머지 둘과 달리 **없어도 답이 나오는 값**이라,
@@ -212,12 +229,21 @@ export function RunwayTool() {
             />
           )}
 
-          <MoneyInput
-            label="그 밖의 생활비 (선택)"
-            value={livingCost}
-            hint="식비·교통비처럼 매달 쓰는 돈"
-            onChange={setLivingCost}
-          />
+          {linkLivingCost ? (
+            <LinkedAmount
+              label="매달 쓰는 변동지출"
+              provided={linkedLivingCost}
+              source="변동지출"
+              onOverride={() => override("livingCost", linkedLivingCost)}
+            />
+          ) : (
+            <MoneyInput
+              label="그 밖의 생활비 (선택)"
+              value={livingCost}
+              hint="식비·교통비처럼 매달 쓰는 돈"
+              onChange={setLivingCost}
+            />
+          )}
         </div>
 
         {/*
@@ -263,8 +289,8 @@ export function RunwayTool() {
         </>
       }
     >
-      <WithAmounts providers={[CashOnHand, MonthlyFixedCost, ContinuingIncome]}>
-        {([cash, fixedCost, income]) => body(cash, fixedCost, income)}
+      <WithAmounts providers={[CashOnHand, MonthlyFixedCost, MonthlyVariableCost, ContinuingIncome]}>
+        {([cash, fixedCost, livingCost, income]) => body(cash, fixedCost, livingCost, income)}
       </WithAmounts>
     </TaskToolPanel>
   );
