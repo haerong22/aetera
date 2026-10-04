@@ -5,12 +5,8 @@ import io.aetera.model.user.Email
 import io.aetera.model.user.UserRepository
 import io.aetera.usecase.notification.BuildDigestService
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -25,15 +21,7 @@ import java.util.UUID
  * 단위 시험이 못 보는 것이 둘이다 — **같은 달을 두 번 적어도 줄이 하나인가**(유니크 인덱스가
  * 받치는 약속), 그리고 **끈 모듈의 API 가 막히는가**(코어 가드의 일).
  */
-@Tag("integration")
-@SpringBootTest(
-    properties = [
-        "security.password.iterations=1000",
-        "aetera.rate-limit.enabled=false",
-    ],
-)
-@AutoConfigureMockMvc
-@Import(TestcontainersConfig::class)
+@AeteraIntegrationTest
 class SpendingIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvcTester

@@ -1,21 +1,13 @@
 package io.aetera.app
 
-import io.aetera.model.mail.Mail
-import io.aetera.model.mail.MailSender
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 import java.util.UUID
 
@@ -29,36 +21,26 @@ import java.util.UUID
  * 한도는 서버 한 대의 기억이라 이 클래스 안의 시험들이 **서로 한도를 나눠 쓴다.**
  * 그래서 시험마다 다른 주소를 쓰고, 넉넉한 쪽이 아니라 **막히는 것**을 단언한다.
  */
-@Tag("integration")
-@SpringBootTest(properties = ["security.password.iterations=1000"])
-@AutoConfigureMockMvc
-@Import(TestcontainersConfig::class, RateLimitIntegrationTest.SilentMail::class)
+@AeteraIntegrationTest
+/*
+ * **이 클래스만 한도를 다시 켠다.** [AeteraIntegrationTest] 는 꺼 둔다 — 다른 시험들은
+ * 같은 주소에서 수십 번 부르므로 켜 두면 엉뚱한 이유로 깨진다. 여기서 볼 것이 한도다.
+ *
+ * `@TestPropertySource` 가 메타 애너테이션의 속성을 덮는다(우선순위가 더 높다).
+ * 속성이 달라 스프링 컨텍스트도 따로 뜨므로, 다른 클래스가 쓴 한도가 섞이지 않는다.
+ */
+@TestPropertySource(properties = ["aetera.rate-limit.enabled=true"])
 class RateLimitIntegrationTest {
-    /** 메일을 붙잡아 둔다. 주소별 한도가 실제로 발송을 막는지 세어 보려면 필요하다. */
-    @TestConfiguration
-    class SilentMail {
-        class Outbox : MailSender {
-            val sent = mutableListOf<Mail>()
-
-            override fun send(mail: Mail) {
-                sent += mail
-            }
-        }
-
-        @Bean
-        @Primary
-        fun outbox() = Outbox()
-    }
-
     @Autowired
     private lateinit var mockMvc: MockMvcTester
 
     @Autowired
-    private lateinit var outbox: SilentMail.Outbox
+    private lateinit var outbox: Outbox
 
+    /** 컨텍스트를 돌려 쓰므로 앞 클래스가 남긴 메일이 보인다 — 읽는 쪽이 비운다. */
     @BeforeEach
     fun clearOutbox() {
-        outbox.sent.clear()
+        outbox.reset()
     }
 
     private fun newEmail() = "ratelimit-${UUID.randomUUID()}@example.com"

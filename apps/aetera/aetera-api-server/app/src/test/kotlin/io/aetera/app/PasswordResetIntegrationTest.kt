@@ -1,19 +1,10 @@
 package io.aetera.app
 
 import com.jayway.jsonpath.JsonPath
-import io.aetera.model.mail.Mail
-import io.aetera.model.mail.MailSender
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
@@ -29,46 +20,13 @@ import java.util.UUID
  *
  * `@Transactional` 을 붙이지 않는다. 요청 사이에 실제로 커밋돼 있어야 다음 요청이 본다.
  */
-@Tag("integration")
-/*
- * 호출 한도를 끈다. 이 시험들은 전부 같은 주소에서 수십 번 부르므로 켜 두면
- * 한도에 걸려 무너진다 — 여기서 볼 것은 한도가 아니다.
- * 한도 자체는 [RateLimitIntegrationTest] 가 본다.
- */
-@SpringBootTest(
-    properties = [
-        "security.password.iterations=1000",
-        "aetera.rate-limit.enabled=false",
-    ],
-)
-@AutoConfigureMockMvc
-@Import(TestcontainersConfig::class, PasswordResetIntegrationTest.CapturingMail::class)
+@AeteraIntegrationTest
 class PasswordResetIntegrationTest {
-    /** 보낸 메일을 붙잡아 두는 발송기. 진짜 SMTP 없이 **나간 글 그대로** 볼 수 있다. */
-    @TestConfiguration
-    class CapturingMail {
-        class Outbox : MailSender {
-            val sent = mutableListOf<Mail>()
-
-            /** 켜면 발송이 터진다. SMTP 가 죽은 날을 흉내 낸다. */
-            var broken = false
-
-            override fun send(mail: Mail) {
-                if (broken) throw IllegalStateException("SMTP 연결 실패")
-                sent += mail
-            }
-        }
-
-        @Bean
-        @Primary
-        fun outbox() = Outbox()
-    }
-
     @Autowired
     private lateinit var mockMvc: MockMvcTester
 
     @Autowired
-    private lateinit var outbox: CapturingMail.Outbox
+    private lateinit var outbox: Outbox
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
@@ -76,10 +34,10 @@ class PasswordResetIntegrationTest {
     private val password = "password1234"
     private val newPassword = "newpassword5678"
 
+    /** 컨텍스트를 돌려 쓰므로 앞 클래스가 남긴 메일이 보인다 — 읽는 쪽이 비운다. */
     @BeforeEach
     fun clearOutbox() {
-        outbox.sent.clear()
-        outbox.broken = false
+        outbox.reset()
     }
 
     private fun newEmail() = "reset-${UUID.randomUUID()}@example.com"
@@ -130,10 +88,7 @@ class PasswordResetIntegrationTest {
         .exchange()
 
     /** 메일 본문에서 사용자가 누를 링크의 토큰을 뽑는다. */
-    private fun tokenFromMail(): String {
-        val body = outbox.sent.last().body
-        return body.substringAfter("reset-password?token=").substringBefore("\n").trim()
-    }
+    private fun tokenFromMail(): String = outbox.resetTokenFromLastMail()
 
     @Test
     fun `메일로 온 링크로 비밀번호를 다시 정한다`() {

@@ -1,12 +1,8 @@
 package io.aetera.app
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
@@ -21,20 +17,7 @@ import java.util.UUID
  * 별도 트랜잭션에서 보이지 않는다 — 검증이 공허하게 통과해 버린다.
  * 대신 테스트마다 다른 이메일을 써서 서로 간섭하지 않게 한다.
  */
-@Tag("integration")
-/*
- * 호출 한도를 끈다. 이 시험들은 전부 같은 주소에서 수십 번 부르므로 켜 두면
- * 한도에 걸려 무너진다 — 여기서 볼 것은 한도가 아니다.
- * 한도 자체는 [RateLimitIntegrationTest] 가 본다.
- */
-@SpringBootTest(
-    properties = [
-        "security.password.iterations=1000",
-        "aetera.rate-limit.enabled=false",
-    ],
-)
-@AutoConfigureMockMvc
-@Import(TestcontainersConfig::class)
+@AeteraIntegrationTest
 class RefreshTokenRotationIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvcTester

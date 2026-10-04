@@ -6,12 +6,8 @@ import io.aetera.model.auth.AuthErrorCode
 import io.aetera.model.module.ModuleErrorCode
 import io.aetera.model.user.UserErrorCode
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -22,20 +18,7 @@ import org.springframework.transaction.annotation.Transactional
  * 플랫폼 계약 전체를 한 흐름으로 검증한다:
  * 가입 → 인증 → 모듈 가드(403) → 모듈 활성화 → 모듈 API 사용 → 비활성화 → 다시 가드(403).
  */
-@Tag("integration")
-/*
- * 호출 한도를 끈다. 이 시험들은 전부 같은 주소에서 수십 번 부르므로 켜 두면
- * 한도에 걸려 무너진다 — 여기서 볼 것은 한도가 아니다.
- * 한도 자체는 [RateLimitIntegrationTest] 가 본다.
- */
-@SpringBootTest(
-    properties = [
-        "security.password.iterations=1000",
-        "aetera.rate-limit.enabled=false",
-    ],
-)
-@AutoConfigureMockMvc
-@Import(TestcontainersConfig::class)
+@AeteraIntegrationTest
 @Transactional
 class ApiIntegrationTest {
     @Autowired

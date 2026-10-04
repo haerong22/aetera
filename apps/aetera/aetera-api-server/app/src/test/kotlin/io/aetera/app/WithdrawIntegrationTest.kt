@@ -3,12 +3,8 @@ package io.aetera.app
 import com.jayway.jsonpath.JsonPath
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -25,20 +21,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester
  * `@Transactional` 을 붙이지 않는다. 붙이면 모든 것이 한 트랜잭션에 묶여
  * flush/clear 가 실제와 다르게 움직이고, 방금 그 버그를 놓친다.
  */
-@Tag("integration")
-/*
- * 호출 한도를 끈다. 이 시험들은 전부 같은 주소에서 수십 번 부르므로 켜 두면
- * 한도에 걸려 무너진다 — 여기서 볼 것은 한도가 아니다.
- * 한도 자체는 [RateLimitIntegrationTest] 가 본다.
- */
-@SpringBootTest(
-    properties = [
-        "security.password.iterations=1000",
-        "aetera.rate-limit.enabled=false",
-    ],
-)
-@AutoConfigureMockMvc
-@Import(TestcontainersConfig::class)
+@AeteraIntegrationTest
 class WithdrawIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvcTester
