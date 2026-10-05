@@ -112,6 +112,24 @@ class GuideContentTest {
         }
     }
 
+    /**
+     * 화면은 설명을 **글자 그대로** 그린다(`{task.description}`) — 마크다운을 쓰지 않는다.
+     * 그래서 `**강조**` 를 적으면 별표가 그대로 보인다. 콘텐츠를 쓰다 KDoc 의 습관이
+     * 설명문으로 넘어오기 쉬운 자리라 여기서 막는다.
+     */
+    @Test
+    fun `설명에 마크다운 표기를 쓰지 않는다`() {
+        guides.forEach { guide ->
+            guide.tasks.forEach { task ->
+                assertThat(task.description)
+                    .withFailMessage {
+                        "가이드 '${guide.id}' 의 '${task.key}' 설명에 마크다운이 있다 — 화면은 글자 그대로 그린다"
+                    }.doesNotContain("**")
+                    .doesNotContain("](")
+            }
+        }
+    }
+
     @Test
     fun `링크는 https 로만 건다`() {
         guides.flatMap { it.tasks }.mapNotNull { it.link }.forEach {
