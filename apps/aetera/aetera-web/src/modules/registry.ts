@@ -5,6 +5,7 @@ import { resignationModule } from "./resignation";
 import { movingModule } from "./moving";
 import { jobChangeModule } from "./job-change";
 import { yearEndTaxModule } from "./year-end-tax";
+import { weddingModule } from "./wedding";
 import { renewalModule } from "./renewal";
 import { goalModule } from "./goal";
 import { expenseModule } from "./expense";
@@ -26,6 +27,7 @@ export const frontendModules: FrontendModule[] = [
   movingModule,
   jobChangeModule,
   yearEndTaxModule,
+  weddingModule,
   renewalModule,
   goalModule,
   expenseModule,
