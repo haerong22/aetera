@@ -7,6 +7,7 @@ import io.aetera.model.guide.GuideTemplate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.stereotype.Component
+import java.lang.reflect.Modifier
 import java.time.LocalDate
 
 /**
@@ -43,6 +44,49 @@ class GuideContentTest {
                 .withFailMessage { "가이드 '${module.simpleName}' 에 @Component 가 없어 카탈로그에 등록되지 않는다" }
                 .isTrue()
         }
+    }
+
+    /**
+     * 콘텐츠 파일만 쓰고 [GuideModule] 클래스를 빠뜨리면 **그 가이드는 아무 시험에도 걸리지 않는다.**
+     * 위 규칙들은 모듈 빈에서 템플릿을 모으므로, 모듈이 없으면 애초에 수집되지 않아 전부 통과한다.
+     * 화면에서만 조용히 사라진다 — 실제로 한 번 그렇게 만들었다.
+     *
+     * 그래서 모듈이 아니라 **콘텐츠 쪽에서** 센다. 코틀린은 파일 최상단 `val` 을
+     * `파일이름Kt` 클래스의 정적 필드로 만들므로, 거기 있는 [GuideTemplate] 을 전부 찾아
+     * 모듈이 들고 있는 것과 맞춰 본다.
+     */
+    @Test
+    fun `콘텐츠 파일마다 모듈이 있다`() {
+        val declaredTemplates =
+            ClassFileImporter()
+                .withImportOption(ImportOption.DoNotIncludeTests())
+                .importPackages(ROOT_PACKAGE)
+                .filter { javaClass -> javaClass.fields.any { it.rawType.name == GuideTemplate::class.java.name } }
+                .flatMap { javaClass ->
+                    javaClass
+                        .reflect()
+                        .declaredFields
+                        /*
+                         * **정적 필드만 본다.** `GuideModule` 구현의 `override val template` 도 같은
+                         * 타입이지만 인스턴스 필드라 `get(null)` 이 NPE 를 낸다 — 터뜨리고 알았다.
+                         * 찾으려는 것은 파일 최상단 `val`, 즉 정적 필드뿐이다.
+                         */
+                        .filter { it.type == GuideTemplate::class.java && Modifier.isStatic(it.modifiers) }
+                        .map { field ->
+                            field.isAccessible = true
+                            javaClass.simpleName to (field.get(null) as GuideTemplate).id
+                        }
+                }
+
+        val registered = guides.map { it.id }.toSet()
+        val orphans = declaredTemplates.filterNot { it.second in registered }
+
+        assertThat(orphans)
+            .withFailMessage {
+                "콘텐츠는 있는데 GuideModule 이 없다: " +
+                    orphans.joinToString { "${it.first}(${it.second})" } +
+                    " — @Component 붙은 GuideModule 구현을 추가해야 카탈로그에 들어간다"
+            }.isEmpty()
     }
 
     @Test
